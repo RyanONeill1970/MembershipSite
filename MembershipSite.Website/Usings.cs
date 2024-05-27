@@ -1,0 +1,14 @@
+﻿global using MembershipSite.Datalayer;
+global using MembershipSite.Logic.ExtensionMethods;
+global using MembershipSite.Logic.Services;
+global using MembershipSite.ViewModels;
+global using MembershipSite.ViewModels.Auth;
+global using MembershipSite.Website.MvcLogic;
+global using Microsoft.AspNetCore.Authorization;
+global using Microsoft.AspNetCore.DataProtection;
+global using Microsoft.AspNetCore.Mvc;
+global using Microsoft.AspNetCore.Razor.TagHelpers;
+global using Microsoft.EntityFrameworkCore;
+global using Microsoft.Extensions.FileProviders;
+global using System.Diagnostics;
+global using System.Text.Json;

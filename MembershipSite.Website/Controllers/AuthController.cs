@@ -1,0 +1,142 @@
+﻿namespace MembershipSite.Website.Controllers;
+
+[AllowAnonymous]
+[Route("auth")]
+public class AuthController(AuthService authService, ILogger<AuthController> logger) : Controller
+{
+    [ActionName("forgot-password")]
+    [Route("forgot-password", Name = "forgot-password")]
+    [HttpGet]
+    public IActionResult ForgotPassword()
+    {
+        var model = new ForgotPasswordViewModel();
+        return View(model);
+    }
+
+    [ActionName("forgot-password")]
+    [Route("forgot-password", Name = "forgot-password")]
+    [HttpPost]
+    public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+    {
+        if (ModelState.IsValid)
+        {
+            await authService.ForgotPasswordAsync(model);
+
+            return RedirectToRoute(nameof(PasswordReset));
+        }
+
+        model.LoginError = "Unable to access your details. Please contact us.";
+        return View(model);
+    }
+
+    [Route("login", Name = nameof(Login))]
+    [HttpGet]
+    public IActionResult Login()
+    {
+        var model = new LoginViewModel();
+        return View(model);
+    }
+
+    [Route("login")]
+    [HttpPost]
+    [ValidateAntiForgeryToken()]
+    public async Task<IActionResult> LoginAsync(LoginViewModel model)
+    {
+        if (ModelState.IsValid)
+        {
+            var loginResult = await authService.AuthenticateAsync(model);
+
+            if (loginResult == LoginResult.Success)
+            {
+                return this.RedirectToLocal(model.ReturnUrl);
+            }
+            if (loginResult == LoginResult.Administrator)
+            {
+                if (string.IsNullOrWhiteSpace(model.ReturnUrl))
+                {
+                    return RedirectToRoute(nameof(MemberAdminController.MemberList));
+                }
+
+                return this.RedirectToLocal(model.ReturnUrl);
+            }
+        }
+
+        model.LoginError = "Unable to log you in. Please check your details.";
+        return View(model);
+    }
+
+    [Route("logout")]
+    [HttpGet]
+    public async Task<IActionResult> Logout()
+    {
+        await authService.LogoutAsync();
+        return View();
+    }
+
+    [Route("register", Name = "register")]
+    [HttpGet]
+    public IActionResult Register()
+    {
+        var model = new RegisterViewModel();
+        return View(model);
+    }
+
+    [Route("register")]
+    [HttpPost]
+    [ValidateAntiForgeryToken()]
+    public async Task<IActionResult> RegisterAsync(RegisterViewModel model)
+    {
+        if (ModelState.IsValid)
+        {
+            var registerUserOutput = await authService.RegisterUserAsync(model);
+
+            if (registerUserOutput.Result == RegisterUserResult.RegisteredPendingApproval ||
+                registerUserOutput.Result == RegisterUserResult.AlreadyExistsAsPending)
+            {
+                return RedirectToRoute(nameof(PendingApproval));
+            }
+
+            if (registerUserOutput.Result == RegisterUserResult.AlreadyExistsAsAuthorised)
+            {
+                return RedirectToRoute(nameof(AlreadyAuthorised));
+            }
+        }
+
+        // One of those 'should not happen' moments, so log for investigation.
+        logger.LogWarning("ModelState was {modelStateJson}.", JsonSerializer.Serialize(ModelState));
+        model.RegistrationError = "Unable to register your account, please contact us.";
+        return View(model);
+    }
+
+    [ActionName("pending-approval")]
+    [Route("pending-approval", Name = nameof(PendingApproval))]
+    [HttpGet]
+    public IActionResult PendingApproval()
+    {
+        return View();
+    }
+
+    [ActionName("already-authorised")]
+    [Route("already-authorised", Name = nameof(AlreadyAuthorised))]
+    [HttpGet]
+    public IActionResult AlreadyAuthorised()
+    {
+        return View();
+    }
+
+    [ActionName("access-denied")]
+    [Route("access-denied", Name = nameof(AccessDenied))]
+    [HttpGet]
+    public IActionResult AccessDenied()
+    {
+        return View();
+    }
+
+    [ActionName("password-reset")]
+    [Route("password-reset", Name = nameof(PasswordReset))]
+    [HttpGet]
+    public IActionResult PasswordReset()
+    {
+        return View();
+    }
+}

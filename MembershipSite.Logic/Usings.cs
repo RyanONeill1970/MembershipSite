@@ -1,0 +1,17 @@
+﻿global using MailKit.Net.Smtp;
+global using MembershipSite.Datalayer.Dal;
+global using MembershipSite.Datalayer.ExtensionMethods;
+global using MembershipSite.Logic.Mail;
+global using MembershipSite.Logic.Models;
+global using MembershipSite.Logic.Services;
+global using MembershipSite.ViewModels;
+global using MembershipSite.ViewModels.Auth;
+global using Microsoft.AspNetCore.Authentication;
+global using Microsoft.AspNetCore.Authentication.Cookies;
+global using Microsoft.AspNetCore.Http;
+global using Microsoft.Extensions.DependencyInjection;
+global using MimeKit;
+global using System;
+global using System.Collections.Generic;
+global using System.Security.Claims;
+global using System.Threading.Tasks;

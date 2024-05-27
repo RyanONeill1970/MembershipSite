@@ -1,0 +1,89 @@
+﻿@model IQueryable<MembershipSite.Datalayer.Models.Member>
+@section headEnd
+{
+    <link href="/css/mvc-grid/mvc-grid.css" rel="stylesheet">
+    <style>
+        .bg-light-success {
+            background-color: #d4edda;
+        }
+    </style>
+}
+
+<h1>Member list</h1>
+
+@(
+Html
+    .Grid(Model)
+    .Build(columns =>
+    {
+        columns
+            .Add(model => Html.CheckBox("Check_" + model.MemberNumber, new { @class = "row-check" }))
+            .Titled(Html.CheckBox("CheckAll"));
+        columns
+            .Add()
+            .RenderedAs((model, row) => row + 1)
+            .Titled("#")
+            .Css("text-center");
+        columns
+            .Add(model => model.MemberNumber)
+            .Titled("Number");
+        columns
+            .Add(model => model.Name)
+            .Titled("Name");
+        columns
+            .Add(model => model.Email)
+            .Titled("Email");
+        columns
+            .Add(model => model.DateRegistered)
+            .Titled("Registered")
+            .Formatted("{0:d}");
+        columns
+            .Add(model => !model.IsApproved)
+            .RenderedAs(model =>
+            {
+                // Only show the approve button if the member is not approved
+                if (!model.IsApproved)
+                {
+                    return Html.ActionLink("Approve", "Approve", new { id = model.MemberNumber }, new { @class = "btn w-100 btn-success" });
+                }
+                return Html.ActionLink("Revoke", "Revoke", new { id = model.MemberNumber }, new { @class = "btn w-100 btn-warning" });
+            })
+            .Encoded(false);
+        columns
+            .Add(model => Html.ActionLink("Delete", "Delete", new { id = model.MemberNumber }, new { @class = "btn w-100 btn-danger" }))
+            .Encoded(false);
+    })
+    .Filterable(GridFilterCase.Lower)
+    .Using(GridFilterMode.Header)
+    .Empty("No data found")
+    .RowAttributed(model => new
+    {
+        @class = model.IsApproved ? "bg-light-success" : null,
+        data_member_number = model.MemberNumber,
+        data_is_approved = model.IsApproved,
+    })
+    .Pageable(pager =>
+    {
+        pager.RowsPerPage = 20;
+        @* pager.TotalRows = ViewBag.TotalRows ?? 0; TODO *@
+        pager.ShowPageSizes = true;
+        pager.PageSizes.Clear();
+    })
+    .Sortable()
+)
+
+<hr />
+<a class="btn btn-primary" href="/auth/logout">Logout</a>
+
+<a class="btn btn-primary disabled" id="approve-all-ticked">Approve all ticked</a>
+<a class="btn btn-danger disabled" id="revoke-all-ticked">Revoke all ticked</a>
+
+
+@section scripts
+{
+    <script src="/js/mvc-grid/mvc-grid.js"></script>
+    <script src="/js/member-list.js"></script>
+    <script>
+        new MemberSite.MemberAdmin.MemberList();
+    </script>
+}
