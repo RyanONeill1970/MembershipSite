@@ -1,6 +1,6 @@
 ﻿namespace MembershipSite.Website.Controllers;
 
-[Authorize(Roles = "MemberAdmin")] // TODO: Use constant with obfuscated value.
+[Authorize(Roles = RoleNames.MemberAdmin)]
 public class MemberAdminController(MemberAdminService memberAdminService) : Controller
 {
     [ActionName("member-list")]

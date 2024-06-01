@@ -15,6 +15,7 @@
 		* Admin
 	* site.css is junk I think. Is it used anywhere?
 	* Role management;
+		* Allow for upload of members via CSV.
 		* Prime first users via register and add to db via UserRole table.
 	* Add a logout button.
 	* How long is the login cookie at present?

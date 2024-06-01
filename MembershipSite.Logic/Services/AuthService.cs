@@ -78,7 +78,7 @@ public class AuthService(AppSettings appSettings, IEmailProvider emailProvider, 
 
         if (member.IsAdmin)
         {
-            claims.Add(new Claim(ClaimTypes.Role, "MemberAdmin")); // TODO: Constants for role names. Maybe make the strings obscure as well such as 'e'.
+            claims.Add(new Claim(ClaimTypes.Role, RoleNames.MemberAdmin));
         }
 
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);

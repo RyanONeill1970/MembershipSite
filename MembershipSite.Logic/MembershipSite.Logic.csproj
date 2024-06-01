@@ -17,6 +17,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\MembershipSite.Contracts\MembershipSite.Contracts.csproj" />
 		<ProjectReference Include="..\MembershipSite.Datalayer\MembershipSite.Datalayer.csproj" />
 		<ProjectReference Include="..\MembershipSite.ViewModels\MembershipSite.ViewModels.csproj" />
 	</ItemGroup>
