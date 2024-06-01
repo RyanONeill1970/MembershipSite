@@ -14,16 +14,16 @@ public static partial class TableConfiguration
                 .IsRequired(true);
 
             entity.Property(m => m.MemberNumber)
-                .HasMaxLength(5) // TODO: Move to common contracts layer so can be enforced in ViewModels.
+                .HasMaxLength(MemberFieldLimits.MemberNumber)
                 .IsUnicode(false);
 
             entity.Property(m => m.Email)
-                .HasMaxLength(100) // TODO: Move to common contracts layer so can be enforced in ViewModels.
+                .HasMaxLength(MemberFieldLimits.Email)
                 .IsRequired(true)
                 .IsUnicode(true);
 
             entity.Property(m => m.Name)
-                .HasMaxLength(100) // TODO: Move to common contracts layer so can be enforced in ViewModels.
+                .HasMaxLength(MemberFieldLimits.Name)
                 .IsRequired(true)
                 .IsUnicode(true);
         });

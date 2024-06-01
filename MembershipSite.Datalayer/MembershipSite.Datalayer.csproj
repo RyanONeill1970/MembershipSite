@@ -24,4 +24,8 @@
     <Folder Include="Migrations\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\MembershipSite.Contracts\MembershipSite.Contracts.csproj" />
+  </ItemGroup>
+
 </Project>
