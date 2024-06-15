@@ -1,6 +1,6 @@
-﻿namespace MemberSite.MemberAdmin {
+﻿namespace MembershipSite.MemberAdmin {
 
-    // TODO: Use package manager.
+    // TODO: Use package manager to download MVCGrid and get typedefs.
     declare let MvcGrid: any;
 
     export class MemberList {

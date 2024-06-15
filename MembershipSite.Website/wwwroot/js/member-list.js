@@ -1,5 +1,5 @@
-var MemberSite;
-(function (MemberSite) {
+var MembershipSite;
+(function (MembershipSite) {
     var MemberAdmin;
     (function (MemberAdmin) {
         class MemberList {
@@ -62,6 +62,6 @@ var MemberSite;
             }
         }
         MemberAdmin.MemberList = MemberList;
-    })(MemberAdmin = MemberSite.MemberAdmin || (MemberSite.MemberAdmin = {}));
-})(MemberSite || (MemberSite = {}));
+    })(MemberAdmin = MembershipSite.MemberAdmin || (MembershipSite.MemberAdmin = {}));
+})(MembershipSite || (MembershipSite = {}));
 //# sourceMappingURL=member-list.js.map
