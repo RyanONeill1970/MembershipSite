@@ -68,7 +68,7 @@ public class Program
         options.DefaultFileNames.Add("index.html");
         app.UseDefaultFiles(options);
 
-        app.UseStaticFiles(); // For normal wwwroot files accessible publicly because we are registered for UseAuthorization.
+        app.UseStaticFiles(); // For normal wwwroot files accessible publicly because we are registered before UseAuthorization.
 
         app.UseRouting();
 
@@ -86,6 +86,6 @@ public class Program
             name: "default",
             pattern: "{controller=StaticContent}/{action=Indexz}/{id?}");
 
-        app.Run();
+        await app.RunAsync();
     }
 }
