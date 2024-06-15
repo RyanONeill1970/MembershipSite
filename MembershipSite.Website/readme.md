@@ -3,7 +3,6 @@
 		* Approve user with auto ticked option to send welcome email.
 		* Delete user.
 		* Ability to create a new user, like registration but choosing everything except password for them. Have a link sent to them.
-	* Logout, does not clear cache as FF can go back into members portal. Should cached be set to false for /secure?
 	* Azure has put a tracker on the site. Get rid of it. Shows up in member list in admin section.
 	* For the forgot password use email instead of member number. People can't remember their member numbers!
 	* When published, /secure/ is showing a 404 instead of using the default of index.html

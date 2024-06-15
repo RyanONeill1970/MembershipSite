@@ -79,7 +79,14 @@ public class Program
         app.UseStaticFiles(new StaticFileOptions
         {
             FileProvider = new PhysicalFileProvider(Path.Combine(builder.Environment.ContentRootPath, "secure")),
-            RequestPath = "/secure"
+            OnPrepareResponse = ctx =>
+            {
+                // Prevent browser caching of anything in the secure directory which ensures when the user logs out they can't access a browser version of the page.
+                ctx.Context.Response.Headers.Append("Cache-Control", "no-cache, no-store, must-revalidate");
+                ctx.Context.Response.Headers.Append("Pragma", "no-cache");
+                ctx.Context.Response.Headers.Append("Expires", "-1");
+            },
+            RequestPath = "/secure",
         });
 
         app.MapControllerRoute( // TODO: Can we delete?
