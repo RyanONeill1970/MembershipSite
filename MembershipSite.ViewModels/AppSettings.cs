@@ -2,6 +2,11 @@
 
 public class AppSettings
 {
+    /// <summary>
+    /// The name by which this application is known to the data protection system.
+    /// </summary>
+    public string ApplicationName { get; set; }
+
     public EmailContacts EmailContacts { get; set; }
 
     public EmailConfig EmailConfig { get; set; }

@@ -1,5 +1,7 @@
 namespace MembershipSite.Website;
 
+using Microsoft.AspNetCore.DataProtection;
+
 public class Program
 {
     public static async Task Main(string[] args)
@@ -24,7 +26,7 @@ public class Program
         builder.Services
             .AddDataProtection()
             .PersistKeysToDbContext<MembershipContext>()
-            .SetApplicationName("BHFS")
+            .SetApplicationName(appSettings.ApplicationName ?? "MembershipWebsite")
             .SetDefaultKeyLifetime(TimeSpan.FromDays(180)); // This helps members who infrequently login.
 
         // Enabling error logging and performance monitoring. Settings held in appsettings.
