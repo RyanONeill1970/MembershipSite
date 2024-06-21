@@ -1,23 +1,85 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Public root for members site.</title>
+    <title>Members Website</title>
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+        }
+
+        header {
+            background: #50b3a2;
+            color: #fff;
+            padding-top: 30px;
+            min-height: 70px;
+            border-bottom: #2980b9 3px solid;
+        }
+
+            header h1 {
+                text-align: center;
+                text-transform: uppercase;
+                margin: 0;
+                font-size: 24px;
+            }
+
+        section {
+            padding: 20px;
+            background: #fff;
+            margin-top: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+            section h2 {
+                color: #50b3a2;
+            }
+
+        p {
+            line-height: 1.6;
+        }
+
+        a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+
+            a:hover {
+                text-decoration: underline;
+            }
+    </style>
 </head>
 <body>
-    <h1>Members website</h1>
-    <p>
-        This page (index.html) is a placeholder for the publicly accessible section of the website.
-
-        Overwrite this page and and add your own content to this folder to make it publicly accessible.
-    </p>
-    <h2>Member only area</h2>
-    <p>
-        For pages or files that only approved members should have access to, upload them to the /secure folder.
-        Any attempt to access them will redirect the visitor to a member login page. Once successfully logged in, they will then be redirected to the content they were trying to access.
-    </p>
-    <p>
-        For example, trying to access the page at <a href="/secure/index.html">/secure/index.html</a> when not logged in will redirect you to a login page.
-    </p>
+    <header>
+        <h1>Members Website</h1>
+    </header>
+    <div class="container">
+        <section>
+            <p>
+                This page (index.html) is a placeholder for the publicly accessible section of the website.
+                Overwrite this page and add your own content to this folder to make it publicly accessible.
+            </p>
+        </section>
+        <section>
+            <h2>Member Only Area</h2>
+            <p>
+                For pages or files that only approved members should have access to, upload them to the /secure folder.
+                Any attempt to access them will redirect the visitor to a member login page. Once successfully logged in, they will then be redirected to the content they were trying to access.
+            </p>
+            <p>
+                For example, trying to access the page at <a href="/secure/index.html">/secure/index.html</a> when not logged in will redirect you to a login page.
+            </p>
+        </section>
+    </div>
 </body>
 </html>

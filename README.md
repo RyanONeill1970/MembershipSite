@@ -11,7 +11,7 @@ If you think it's missing some functionality, either raise an issue or contact m
 ## Hosting
 * Requires .Net 8, can run in Linux plans. I've tested this on Microsoft Azure / Linux
 * Requires Microsoft SQL Server
-* If you don't want to host your own instance and are a society / club, I may be able to host it for a fee (email ryan at ryanoneill.com). This would help me offset the costs of further development.
+* If you don't want to host your own instance and are a society / club, I may be able to host it for a reasonable fee (email ryan at ryanoneill.com). This would help me offset the costs of further development.
 
 ## Getting started
 * Clone the repository

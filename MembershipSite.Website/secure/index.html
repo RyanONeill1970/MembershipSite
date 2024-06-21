@@ -1,19 +1,81 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Members only area.</title>
+    <title>Members Only Area</title>
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+        }
+
+        header {
+            background: #50b3a2;
+            color: #fff;
+            padding-top: 30px;
+            min-height: 70px;
+            border-bottom: #2980b9 3px solid;
+        }
+
+            header h1 {
+                text-align: center;
+                text-transform: uppercase;
+                margin: 0;
+                font-size: 24px;
+            }
+
+        section {
+            padding: 20px;
+            background: #fff;
+            margin-top: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+            section h2 {
+                color: #50b3a2;
+            }
+
+        p {
+            line-height: 1.6;
+        }
+
+        a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+
+            a:hover {
+                text-decoration: underline;
+            }
+    </style>
 </head>
 <body>
-    <h1>Members website</h1>
-    <p>
-        This page (index.html) is a placeholder for the member only section of the website.
-
-        Overwrite this page and and add your own content to this folder.
-    </p>
-    <h2>Logging out</h2>
-    <p>
-        To logout, follow this link: <a href="/auth/logout">/logout</a>
-    </p>
+    <header>
+        <h1>Members Website</h1>
+    </header>
+    <div class="container">
+        <section>
+            <p>
+                This page (index.html) is a placeholder for the member only section of the website.
+                Overwrite this page and add your own content to this folder.
+            </p>
+        </section>
+        <section>
+            <h2>Logging Out</h2>
+            <p>
+                To logout, follow this link: <a href="/auth/logout">/logout</a>
+            </p>
+        </section>
+    </div>
 </body>
 </html>
