@@ -1,13 +1,13 @@
 namespace MembershipSite.Website.Controllers;
 
 [AllowAnonymous]
+[Route("")]
 public class HomeController : Controller
 {
-    [Route("not-found")]
-    [ActionName("not-found")]
-    public IActionResult NotFound(int code)
+    [Route("page-not-found")]
+    [ActionName("page-not-found")]
+    public IActionResult PageNotFound()
     {
-        ViewBag.StatusCode = code;
         return View();
     }
 
