@@ -1,6 +1,6 @@
 ﻿namespace MembershipSite.Logic.Mail;
 
-public class MailgunProvider(EmailConfig emailConfig) : IEmailProvider
+public class MailgunProvider(EmailConfig emailConfig, ILogger<MailgunProvider> logger) : IEmailProvider
 {
     public async Task SendAsync(string toName, string toEmail, string fromName, string fromEmail, string subject, string body, List<MimePart> files, bool isBodyHtml, string bcc, string replyName = "", string replyEmail = "")
     {
@@ -57,15 +57,31 @@ public class MailgunProvider(EmailConfig emailConfig) : IEmailProvider
 
     private bool ConfigIsValid(EmailConfig emailConfig)
     {
-        if (emailConfig is null ||
-            string.IsNullOrWhiteSpace(emailConfig.Password) ||
-            string.IsNullOrWhiteSpace(emailConfig.Server) ||
-            string.IsNullOrWhiteSpace(emailConfig.Username) ||
-            emailConfig.Port == 0)
+        if (emailConfig is null)
         {
-            return false;
+            logger.LogError("Email configuration is null, unable to send emails.");
+        }
+        else if (string.IsNullOrWhiteSpace(emailConfig.Password))
+        {
+            logger.LogError("Email configuration password is null or empty, unable to send emails.");
+        }
+        else if (string.IsNullOrWhiteSpace(emailConfig.Server))
+        {
+            logger.LogError("Email configuration server is null or empty, unable to send emails.");
+        }
+        else if (string.IsNullOrWhiteSpace(emailConfig.Username))
+        {
+            logger.LogError("Email configuration username is null or empty, unable to send emails.");
+        }
+        else if (emailConfig.Port == 0)
+        {
+            logger.LogError("Email configuration port is 0, unable to send emails.");
+        }
+        else
+        {
+            return true;
         }
 
-        return true;
+        return false;
     }
 }
