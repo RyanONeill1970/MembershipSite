@@ -91,7 +91,8 @@ public class AuthService(AppSettings appSettings, IEmailProvider emailProvider, 
             ExpiresUtc = DateTimeOffset.UtcNow.AddDays(60) // Set cookie expiration date
         };
 
-        await httpContextAccessor.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, authenticationProperties);
+        var httpContext = httpContextAccessor.HttpContext!;
+        await httpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, authenticationProperties);
 
         if (member.IsAdmin)
         {
@@ -111,6 +112,7 @@ public class AuthService(AppSettings appSettings, IEmailProvider emailProvider, 
 
     public async Task LogoutAsync()
     {
-        await httpContextAccessor.HttpContext.SignOutAsync();
+        var httpContext = httpContextAccessor.HttpContext!;
+        await httpContext.SignOutAsync();
     }
 }
