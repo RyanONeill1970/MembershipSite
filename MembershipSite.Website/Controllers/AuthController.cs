@@ -139,4 +139,48 @@ public class AuthController(AuthService authService, ILogger<AuthController> log
     {
         return View();
     }
+
+    [ActionName("set-password")]
+    [Route("set-password/{passwordResetToken:guid}", Name = "set-password")]
+    [HttpGet]
+    public IActionResult SetPassword(Guid passwordResetToken)
+    {
+        if (ModelState.IsValid)
+        {
+            var model = new SetPasswordViewModel { PasswordResetToken = passwordResetToken };
+            return View(model);
+        }
+
+        // Someone is fiddling with the route parameters, just redirect to access denied.
+        return RedirectToRoute(nameof(AccessDenied));
+    }
+
+    [ActionName("set-password")]
+    [Route("set-password/{passwordResetToken:guid}", Name = "set-password")]
+    [HttpPost]
+    public async Task<IActionResult> SetPassword(SetPasswordViewModel model)
+    {
+        if (ModelState.IsValid)
+        {
+            var success = await authService.SetPasswordAsync(model);
+
+            if (success)
+            {
+                return RedirectToRoute(nameof(PasswordHasBeenSet));
+            }
+
+            // TODO: Could do with instrumenting this. If end users see this, it's annoying and painful to debug.
+            ModelState.AddModelError(nameof(SetPasswordViewModel.Password), "Unable to set your password. Please try again.");
+        }
+
+        return View(model);
+    }
+
+    [ActionName("password-has-been-set")]
+    [Route("password-has-been-set", Name = nameof(PasswordHasBeenSet))]
+    [HttpGet]
+    public IActionResult PasswordHasBeenSet()
+    {
+        return View();
+    }
 }

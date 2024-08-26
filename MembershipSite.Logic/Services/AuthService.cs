@@ -36,7 +36,7 @@ public class AuthService(AppSettings appSettings, IEmailProvider emailProvider, 
         {
             // User exists and is not yet authorised, redirect to a 'you have been registered, we'll get back to you'.
             var body = $"""
-                Member '{model.Name}' with membership number '{model.MemberNumber}' is trying to register again but has not yet has their original request approved.
+                Member '{model.Name}' with membership number '{model.MemberNumber}' is trying to register again but has not yet had their original request approved.
 
                 There is no issue with this, they will have been shown the same 'you have been registered' message as before.
 
@@ -71,6 +71,17 @@ public class AuthService(AppSettings appSettings, IEmailProvider emailProvider, 
             return LoginResult.InvalidPassword;
         }
 
+        await SignInAsync(member);
+
+        if (member.IsAdmin)
+        {
+            return LoginResult.Administrator;
+        }
+        return LoginResult.Success;
+    }
+
+    private async Task SignInAsync(Datalayer.Models.Member member)
+    {
         var claims = new List<Claim>
         {
             new(ClaimTypes.Name, member.MemberNumber),
@@ -87,32 +98,73 @@ public class AuthService(AppSettings appSettings, IEmailProvider emailProvider, 
 
         var authenticationProperties = new AuthenticationProperties
         {
-            IsPersistent = true, // model.RememberMe, // Or true if you want the cookie to be persistent
+            IsPersistent = true, // model.RememberMe,
             ExpiresUtc = DateTimeOffset.UtcNow.AddDays(60) // Set cookie expiration date
         };
 
         var httpContext = httpContextAccessor.HttpContext!;
         await httpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, authenticationProperties);
-
-        if (member.IsAdmin)
-        {
-            return LoginResult.Administrator;
-        }
-        return LoginResult.Success;
     }
 
     public async Task ForgotPasswordAsync(ForgotPasswordViewModel model)
     {
-        // TODO: Complete this and password-reset view.
-        // Retrieve member.
-        // If exists, set a GUID on their password reset field.
-        // Save.
-        // Email them.
+        var member = await memberDal.ByEmailAsync(model.Email);
+
+        if (member is null)
+        {
+            // We don't return a 'not found' message this as it could be used by an attacker doing credential stuffing or checking for valid emails.
+            return;
+        }
+
+        member.PasswordResetToken = Guid.NewGuid();
+        var httpContext = httpContextAccessor.HttpContext!;
+        var websiteUrl = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}";
+
+        var subject = $"{appSettings.ApplicationName} - password reset request.";
+        var body = $"""
+            Hi {member.Name},
+
+            You have requested a password reset. Please click the following link to reset your password:
+
+            {websiteUrl}/auth/set-password/{member.PasswordResetToken}
+
+            If you did not request this, please ignore this email.
+
+            Thank you,
+
+            The {appSettings.ApplicationName} team.
+            """;
+        var contacts = appSettings.EmailContacts;
+        await emailProvider.SendAsync(member.Name, model.Email, contacts.WebsiteFromName, contacts.WebsiteFromEmail,
+            subject, body, null, false, contacts.DeveloperEmail);
+
+        await memberDal.CommitAsync();
     }
 
     public async Task LogoutAsync()
     {
         var httpContext = httpContextAccessor.HttpContext!;
         await httpContext.SignOutAsync();
+    }
+
+    public async Task<bool> SetPasswordAsync(SetPasswordViewModel model)
+    {
+        // TODO: Have an expiry on the password reset token. Maybe have it configurable in the app settings.
+        var member = await memberDal.ByPasswordResetTokenAsync(model.PasswordResetToken);
+
+        if (member is null)
+        {
+            // TODO: Should instrument this for the admin.
+            return false;
+        }
+
+        member.PasswordResetToken = null;
+        member.PasswordHash = PasswordValidator.HashPassword(model.Password);
+
+        await memberDal.CommitAsync();
+
+        await SignInAsync(member);
+
+        return true;
     }
 }

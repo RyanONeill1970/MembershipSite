@@ -22,4 +22,12 @@ public class MemberDal(MembershipContext context) : BaseDal<Member>(context)
             .Where(m => m.MemberNumber == memberNumber)
             .FirstOrDefaultAsync();
     }
+
+    public async Task<Member?> ByPasswordResetTokenAsync(Guid passwordResetToken)
+    {
+        return await context
+            .Members
+            .Where(m => m.PasswordResetToken == passwordResetToken)
+            .FirstOrDefaultAsync();
+    }
 }
