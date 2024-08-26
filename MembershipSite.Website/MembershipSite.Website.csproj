@@ -18,8 +18,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.7" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.7">
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.8">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -28,12 +28,11 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="NonFactors.Grid.Mvc6" Version="7.2.1" />
-    <PackageReference Include="Sentry.AspNetCore" Version="4.9.0" />
+    <PackageReference Include="Sentry.AspNetCore" Version="4.10.2" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Properties\ServiceDependencies\" />
-    <Folder Include="Views\Home\" />
     <Folder Include="wwwroot\images\" />
   </ItemGroup>
 
