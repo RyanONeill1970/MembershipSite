@@ -6,5 +6,5 @@ public class ForgotPasswordViewModel
     [DataType(DataType.EmailAddress)]
     public string Email { get; set; }
 
-    public string LoginError { get; set; }
+    public string LoginError { get; set; } = "";
 }
