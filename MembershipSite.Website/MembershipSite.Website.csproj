@@ -7,11 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="secure\index.html" />
+    <None Remove="secure\_index.html" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="secure\index.html">
+    <Content Include="secure\_index.html">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
