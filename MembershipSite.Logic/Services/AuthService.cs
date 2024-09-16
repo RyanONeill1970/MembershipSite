@@ -58,16 +58,19 @@ public class AuthService(AppSettings appSettings, IEmailProvider emailProvider, 
 
         if (member is null)
         {
+            AppLogging.Write($"Login attempt for email '{model.Email}' failed as the email was not found.");
             return LoginResult.NotFound;
         }
 
         if (!member.IsApproved)
         {
+            AppLogging.Write($"Login attempt for email '{model.Email}' failed as the member is not approved.");
             return LoginResult.NotApproved;
         }
 
         if (!PasswordValidator.ComparePassword(model.Password, member.PasswordHash))
         {
+            AppLogging.Write($"Login attempt for email '{model.Email}' failed as the password was incorrect.");
             return LoginResult.InvalidPassword;
         }
 
@@ -75,8 +78,11 @@ public class AuthService(AppSettings appSettings, IEmailProvider emailProvider, 
 
         if (member.IsAdmin)
         {
+            AppLogging.Write($"Login attempt for email '{model.Email}' was successful as admin user.");
             return LoginResult.Administrator;
         }
+
+        AppLogging.Write($"Login attempt for email '{model.Email}' was successful as normal user.");
         return LoginResult.Success;
     }
 
