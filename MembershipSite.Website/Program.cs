@@ -21,6 +21,10 @@ public class Program
             .AddHttpContextAccessor()
             .AddWebsiteServices(appSettings)
             .AddControllersWithViews()
+            .AddRazorOptions(options =>
+            {
+                options.ViewLocationExpanders.Add(new ThemeViewLocator());
+            })
             .AddRazorRuntimeCompilation();
 
         builder.Services
