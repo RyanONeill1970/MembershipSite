@@ -62,9 +62,8 @@ public class Program
             await context.Database.MigrateAsync();
         }
 
-        app.UseAuthentication();
-
-        app.UseHttpsRedirection();
+        // TODO: Re-enable.
+        //app.UseHttpsRedirection();
 
         // If requester does not specify a file, use index.html
         var options = new DefaultFilesOptions();
@@ -72,17 +71,29 @@ public class Program
         options.DefaultFileNames.Add("index.html");
         app.UseDefaultFiles(options);
 
-        app.UseStaticFiles(); // For normal wwwroot files accessible publicly because we are registered before UseAuthorization.
+        app.UseMiddleware<LoginLinksMiddleware>();
 
         app.UseRouting();
 
         // Everything after this point is secured implicitly unless opted out (via attributes on action).
+        app.UseAuthentication();
+        app.UseStaticFiles(); // For normal wwwroot files accessible publicly because we are registered before UseAuthorization.
         app.UseAuthorization();
+
+        var secureDefaultFileOptions = new DefaultFilesOptions
+        {
+            FileProvider = new PhysicalFileProvider(Path.Combine(builder.Environment.ContentRootPath, "secure")),
+            RequestPath = "/secure"
+        };
+        secureDefaultFileOptions.RequestPath = "/secure";
+        secureDefaultFileOptions.DefaultFileNames.Clear();
+        secureDefaultFileOptions.DefaultFileNames.Add("index.html");
+        app.UseDefaultFiles(secureDefaultFileOptions);
 
         // Keep the 'secure' static files out of wwwroot so they can be locked down. Must be after UseAuthorization.
         app.UseStaticFiles(new StaticFileOptions
         {
-            FileProvider = new PhysicalFileProvider(Path.Combine(builder.Environment.ContentRootPath, "secure")),
+            FileProvider = secureDefaultFileOptions.FileProvider,
             OnPrepareResponse = ctx =>
             {
                 // Prevent browser caching of anything in the secure directory which ensures when the user logs out they can't access a browser version of the page.
@@ -93,9 +104,12 @@ public class Program
             RequestPath = "/secure",
         });
 
-        app.MapControllerRoute( // TODO: Can we delete?
+        // TODO: Trying to figure out the 404 issue that is documented here - https://github.com/dotnet/AspNetCore.Docs/issues/32366
+
+        // TODO: Following is required as without we get redirect loops. Investigate why.
+        app.MapControllerRoute(// CHECKING.
             name: "default",
-            pattern: "{controller=StaticContent}/{action=Indexz}/{id?}");
+            pattern: "{controller=Home}/{action=Index}/{id?}");
 
         await app.RunAsync();
     }
