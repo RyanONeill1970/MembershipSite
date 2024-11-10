@@ -1,0 +1,187 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <link REL="SHORTCUT ICON" HREF="favicon.ico">
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <title>@ViewData["Title"]</title>
+    <link href="/css/site.css" rel="stylesheet">
+    <link href="/lib/bootstrap-icons/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="/css/unreset.css" rel="stylesheet">
+    <link rel="stylesheet" href="/bfhs3.css" type="text/css">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="SHORTCUT ICON" HREF="/favicon.ico" type="image/x-icon" />
+
+    <style type="text/css">
+        .container {
+            overflow: hidden;
+            background-color: #333;
+            font-family: Arial;
+            padding: 0;
+        }
+            .container a {
+                float: left;
+                font-size: 16px;
+                color: white;
+                text-align: center;
+                padding: 14px 16px;
+                text-decoration: none;
+                font-family: arial;
+            }
+
+        .dropdown {
+            float: left;
+            overflow: hidden;
+        }
+
+            .dropdown .dropbtn {
+                font-size: 16px;
+                border: none;
+                outline: none;
+                color: white;
+                padding: 14px 16px;
+                background-color: #333;
+                font-family: arial;
+            }
+
+            .container a:hover, .dropdown:hover .dropbtn {
+                background-color: red;
+            }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+        }
+
+            .dropdown-content a {
+                float: none;
+                color: black;
+                padding: 12px 16px;
+                text-decoration: none;
+                display: block;
+                text-align: left;
+            }
+
+                .dropdown-content a:hover {
+                    background-color: #ddd;
+                }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        h1, h2, h3, p {
+            margin: 0;
+        }
+
+        .title {
+            color: white;
+            font-family: Gotham, "Helvetica Neue", Helvetica, Arial, "sans-serif";
+        }
+    </style>
+
+    <div id="fb-root"></div>
+
+    <script>
+        (function (d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) return;
+            js = d.createElement(s); js.id = id;
+            js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.9";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));</script>
+
+    @await RenderSectionAsync("headEnd", required: false)
+</head>
+<body>
+
+    <table width="960" border="0" align="center" cellpadding="0" cellspacing="3" mm:layoutgroup="true">
+        <tr>
+            <td height="162" colspan="3" align="left" valign="top" nowrap background="/bridge.jpg">
+
+                <p align="center">
+                    <strong>
+                        <br>
+                        <img src="/Beds.gif" width="460" height="29" border="0" alt="Bedfordshire Family History Society">
+                    </strong>
+                </p>
+                <h3 align="center">
+                    <strong>
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="1">
+                            PO Box 214, Bedford MK41 8WB<br>
+                            <a href="https://www.bfhs.org.uk">https://www.bfhs.org.uk</a><br>
+                            <a href="https://www.facebook.com/BedfordshireFamilyHistorySociety/"><img src="/FB-fLogo-Blue-broadcast-2.png" width="10" alt="facebook"></a> <a href="https://www.facebook.com/BedfordshireFamilyHistorySociety/">https://www.facebook.com/BedfordshireFamilyHistorySociety/</a><br>
+                        </font>
+                    </strong><strong>
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="1">
+                            Patron: Dr Colin R Chapman MA, CEng, CSci, CChem, FEI, FNucI, FRSC, FRSH, FSG<br>
+                            President: Pamela Birch<br>
+                            Registered Charity Number 281677
+                        </font>
+                    </strong>
+                </h3>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3" align="center" valign="middle">
+                <div class="container">
+                    <a href="/index.html"><img src="/Bfhs4.gif" alt="bfhs logo" height="70" border="0"></a><a href="membership.html">Join Us</a>
+                    <div class="dropdown">
+                        <button class="dropbtn" onClick="myFunction()">
+                            Society<br>
+                            Information
+                        </button>
+                        <div class="dropdown-content" id="myDropdown"> <a href="news.html">News</a> <a href="society.html">The Society</a> <a href="membership.html">Membership</a> <a href="publications.html">Publications</a> <a href="bookstall.html">Bookstall &amp; Downloads</a> <a href="committee.html">The Committee</a> <a href="talks.html">Future Meetings &amp; Events</a> <a href="meetings.html">At The Meetings</a> <a href="guestbook.html">The Guestbook</a><a href="jindex.html">Journal Surname Index</a> <a href="BFHS%20Data%20Protection%20Policy%20Issue%201.pdf">Data Protection Policy</a></div>
+                    </div>
+                    <div class="dropdown">
+                        <div class="container">
+                            <a href="membersportal.html">Members'<br>Portal</a>
+                        </div>
+                    </div>
+                    <div class="dropdown">
+                        <button class="dropbtn" onClick="myFunction()">Online <br>Stores</button>
+                        <div class="dropdown-content" id="myDropdown3">
+                            <a href="http://www.genfair.co.uk/supplier.php?sid=11">Genfair</a>
+                            <a href="https://www.parishchest.com/bedfordshire-fhs-3501.php">Parish Chest</a>
+                        </div>
+                    </div>
+                    <div class="dropdown">
+                        <button class="dropbtn" onClick="myFunction()">Local <br>Interest</button>
+                        <div class="dropdown-content" id="myDropdown4"> <a href="maps.html">Maps of Bedfordshire</a> <a href="photo.html">Photographs</a> <a href="strays.html">Strays</a> <a href="http://www.roll-of-honour.com/Bedfordshire/">War Memorials</a> </div>
+                    </div>
+                    <div>
+                        <a href="links.html">
+                            Useful<br>
+                            Links
+                        </a>
+                        <a href="contact/index.html">Contact Us</a>
+                        <mws:loginLinks />
+                     </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @RenderBody()
+            </td>
+        </tr>
+    </table>
+    <environment include="Development">
+        <script src="/lib/bootstrap/js/bootstrap.bundle.js"></script>
+        <script src="/lib/aspnet-validation.js"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+        <script src="/lib/aspnet-validation.min.js"></script>
+    </environment>
+
+    @* TODO: Move to dev / bundle *@
+    <script src="/js/validator-bridge.js"></script>
+
+    @await RenderSectionAsync("scripts", required: false)
+</body>
+</html>
