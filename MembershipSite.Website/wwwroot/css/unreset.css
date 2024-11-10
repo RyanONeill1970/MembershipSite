@@ -1,0 +1,4 @@
+﻿/* Styles to undo the layout set by Bootstrap / reset.css so that the old site layout looks the same. */
+table {
+    border-collapse: separate;
+}
