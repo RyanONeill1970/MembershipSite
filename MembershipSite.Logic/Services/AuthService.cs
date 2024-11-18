@@ -28,9 +28,12 @@ public class AuthService(AppSettings appSettings, IEmailProvider emailProvider, 
                 """;
             var contacts = appSettings.EmailContacts;
 
-            foreach (var registrationContact in appSettings.EmailContacts.RegistrationContacts)
+            if (contacts.RegistrationContacts is not null)
             {
-                await emailProvider.SendAsync(registrationContact.Name, registrationContact.Email, contacts.WebsiteFromName, contacts.WebsiteFromEmail, "Website membership registration", body, [], false, contacts.DeveloperEmail);
+                foreach (var registrationContact in contacts.RegistrationContacts)
+                {
+                    await emailProvider.SendAsync(registrationContact.Name, registrationContact.Email, contacts.WebsiteFromName, contacts.WebsiteFromEmail, "Website membership registration", body, [], false, contacts.DeveloperEmail);
+                }
             }
 
             return new RegisterUserOutput { Result = RegisterUserResult.RegisteredPendingApproval };
@@ -48,9 +51,12 @@ public class AuthService(AppSettings appSettings, IEmailProvider emailProvider, 
                 """;
             var contacts = appSettings.EmailContacts;
 
-            foreach (var registrationContact in appSettings.EmailContacts.RegistrationContacts)
+            if (contacts.RegistrationContacts is not null)
             {
-                await emailProvider.SendAsync(registrationContact.Name, registrationContact.Email, contacts.WebsiteFromName, contacts.WebsiteFromEmail, "Duplicate website membership registration", body, null, false, contacts.DeveloperEmail);
+                foreach (var registrationContact in contacts.RegistrationContacts)
+                {
+                    await emailProvider.SendAsync(registrationContact.Name, registrationContact.Email, contacts.WebsiteFromName, contacts.WebsiteFromEmail, "Duplicate website membership registration", body, null, false, contacts.DeveloperEmail);
+                }
             }
 
             return new RegisterUserOutput { Result = RegisterUserResult.AlreadyExistsAsPending };
