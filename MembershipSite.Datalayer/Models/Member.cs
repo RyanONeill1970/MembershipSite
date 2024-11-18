@@ -2,7 +2,7 @@
 
 public class Member
 {
-    public DateTime DateRegistered { get; set; }
+    public DateTimeOffset DateRegistered { get; set; }
 
     public string Email { get; set; } = "";
 

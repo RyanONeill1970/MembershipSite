@@ -11,7 +11,7 @@ public class AuthService(AppSettings appSettings, IEmailProvider emailProvider, 
             // User does not exist - register as pending and email webmaster.
             member = memberDal.Add();
 
-            member.DateRegistered = DateTime.Now;
+            member.DateRegistered = DateTimeOffset.UtcNow;
             member.Email = model.Email;
             member.IsAdmin = false;
             member.IsApproved = false;
