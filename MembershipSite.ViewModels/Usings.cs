@@ -1,1 +1,2 @@
-﻿global using System.ComponentModel.DataAnnotations;
+﻿global using MembershipSite.Contracts;
+global using System.ComponentModel.DataAnnotations;

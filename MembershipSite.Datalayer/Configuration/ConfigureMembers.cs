@@ -13,17 +13,22 @@ public static partial class TableConfiguration
             entity.Property(m => m.DateRegistered)
                 .IsRequired(true);
 
-            entity.Property(m => m.MemberNumber)
-                .HasMaxLength(MemberFieldLimits.MemberNumber)
-                .IsUnicode(false);
-
             entity.Property(m => m.Email)
                 .HasMaxLength(MemberFieldLimits.Email)
                 .IsRequired(true)
                 .IsUnicode(true);
 
+            entity.Property(m => m.MemberNumber)
+                .HasMaxLength(MemberFieldLimits.MemberNumber)
+                .IsUnicode(false);
+
             entity.Property(m => m.Name)
                 .HasMaxLength(MemberFieldLimits.Name)
+                .IsRequired(true)
+                .IsUnicode(true);
+
+            entity.Property(m => m.PasswordHash)
+                .HasMaxLength(MemberFieldLimits.PasswordHash)
                 .IsRequired(true)
                 .IsUnicode(true);
         });
