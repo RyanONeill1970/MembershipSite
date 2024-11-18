@@ -12,6 +12,11 @@ public class AppSettings
     public EmailConfig EmailConfig { get; set; }
 
     /// <summary>
+    /// The number of days after a password reset token is issued that it will expire.
+    /// </summary>
+    public int PasswordResetTokenExpiryDays { get; set; }
+
+    /// <summary>
     /// Text to be added to the end of the page title for all pages rendered
     /// by the membership aspect of the site (authorisation and admin pages).
     /// 

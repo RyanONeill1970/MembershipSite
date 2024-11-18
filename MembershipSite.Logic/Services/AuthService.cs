@@ -1,6 +1,6 @@
 ﻿namespace MembershipSite.Logic.Services;
 
-public class AuthService(AppSettings appSettings, IEmailProvider emailProvider, IHttpContextAccessor httpContextAccessor, MemberDal memberDal)
+public class AuthService(AppSettings appSettings, IEmailProvider emailProvider, IHttpContextAccessor httpContextAccessor, MemberDal memberDal, TimeProvider timeProvider)
 {
     public async Task<RegisterUserOutput> RegisterUserAsync(RegisterViewModel model)
     {
@@ -131,6 +131,7 @@ public class AuthService(AppSettings appSettings, IEmailProvider emailProvider, 
         }
 
         member.PasswordResetToken = Guid.NewGuid();
+        member.PasswordResetTokenExpiry = DateTimeOffset.Now.AddDays(appSettings.PasswordResetTokenExpiryDays);
         var httpContext = httpContextAccessor.HttpContext!;
         var websiteUrl = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}";
 
@@ -163,16 +164,16 @@ public class AuthService(AppSettings appSettings, IEmailProvider emailProvider, 
 
     public async Task<bool> SetPasswordAsync(SetPasswordViewModel model)
     {
-        // TODO: Have an expiry on the password reset token. Maybe have it configurable in the app settings.
         var member = await memberDal.ByPasswordResetTokenAsync(model.PasswordResetToken);
 
-        if (member is null)
+        if (!PasswordResetGuidIsValid(member))
         {
             // TODO: Should instrument this for the admin.
             return false;
         }
 
         member.PasswordResetToken = null;
+        member.PasswordResetTokenExpiry = null;
         member.PasswordHash = PasswordValidator.HashPassword(model.Password);
 
         await memberDal.CommitAsync();
@@ -180,5 +181,27 @@ public class AuthService(AppSettings appSettings, IEmailProvider emailProvider, 
         await SignInAsync(member);
 
         return true;
+    }
+
+    public async Task<bool> ValidatePasswordResetToken(Guid passwordResetToken)
+    {
+        var member = await memberDal.ByPasswordResetTokenAsync(passwordResetToken);
+
+        return PasswordResetGuidIsValid(member);
+    }
+
+    private bool PasswordResetGuidIsValid(Member? member)
+    {
+        if (member is null)
+        {
+            return false;
+        }
+
+        if (member.PasswordResetTokenExpiry is null)
+        {
+            return false;
+        }
+
+        return member.PasswordResetTokenExpiry >= timeProvider.GetUtcNow();
     }
 }

@@ -17,4 +17,6 @@ public class Member
     public string PasswordHash { get; set; } = "";
 
     public Guid? PasswordResetToken { get; set; }
+
+    public DateTimeOffset? PasswordResetTokenExpiry { get; set; }
 }

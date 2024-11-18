@@ -1,0 +1,25 @@
+﻿@model LoginViewModel
+@{
+    ViewData["Title"] = "Password reset expired";
+}
+<div class="bg-light min-vh-100 pt-5">
+    <div>
+        <div class="row justify-content-center">
+            <div class="col-lg-12">
+                <div class="card-group d-block d-md-flex row">
+                    <div class="card-body text-center">
+                        <div>
+                            <h2>Password reset link is not valid</h2>
+                            <p>The link you have followed to reset your password is out of date or has already been used.</p>
+                            <p>
+                                You can generate a new password reset link by using the
+
+                                <a asp-route="forgot-password" class="btn btn-link px-0">forgot password</a> page.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

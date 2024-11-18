@@ -132,6 +132,14 @@ public class AuthController(AuthService authService, ILogger<AuthController> log
         return View();
     }
 
+    [ActionName("token-expired")]
+    [Route("token-expired", Name = nameof(TokenExpired))]
+    [HttpGet]
+    public IActionResult TokenExpired()
+    {
+        return View();
+    }
+
     [ActionName("password-reset")]
     [Route("password-reset", Name = nameof(PasswordReset))]
     [HttpGet]
@@ -143,12 +151,19 @@ public class AuthController(AuthService authService, ILogger<AuthController> log
     [ActionName("set-password")]
     [Route("set-password/{passwordResetToken:guid}", Name = "set-password")]
     [HttpGet]
-    public IActionResult SetPassword(Guid passwordResetToken)
+    public async Task<IActionResult> SetPasswordAsync(Guid passwordResetToken)
     {
         if (ModelState.IsValid)
         {
-            var model = new SetPasswordViewModel { PasswordResetToken = passwordResetToken };
-            return View(model);
+            var tokenIsValid = await authService.ValidatePasswordResetToken(passwordResetToken);
+
+            if (tokenIsValid)
+            {
+                var model = new SetPasswordViewModel { PasswordResetToken = passwordResetToken };
+                return View(model);
+            }
+
+            return RedirectToRoute(nameof(TokenExpired));
         }
 
         // Someone is fiddling with the route parameters, just redirect to access denied.

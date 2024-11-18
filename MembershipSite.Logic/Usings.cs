@@ -2,6 +2,7 @@
 global using MembershipSite.Contracts;
 global using MembershipSite.Datalayer.Dal;
 global using MembershipSite.Datalayer.ExtensionMethods;
+global using MembershipSite.Datalayer.Models;
 global using MembershipSite.Logic.Mail;
 global using MembershipSite.Logic.Models;
 global using MembershipSite.Logic.Services;
