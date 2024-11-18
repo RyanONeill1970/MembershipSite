@@ -27,7 +27,11 @@ public class AuthService(AppSettings appSettings, IEmailProvider emailProvider, 
                 Their email address is '{model.Email}'.
                 """;
             var contacts = appSettings.EmailContacts;
-            await emailProvider.SendAsync(contacts.RegistrationsToName, contacts.RegistrationsToEmail, contacts.WebsiteFromName, contacts.WebsiteFromEmail, "Website membership registration", body, [], false, contacts.DeveloperEmail);
+
+            foreach (var registrationContact in appSettings.EmailContacts.RegistrationContacts)
+            {
+                await emailProvider.SendAsync(registrationContact.Name, registrationContact.Email, contacts.WebsiteFromName, contacts.WebsiteFromEmail, "Website membership registration", body, [], false, contacts.DeveloperEmail);
+            }
 
             return new RegisterUserOutput { Result = RegisterUserResult.RegisteredPendingApproval };
         }
@@ -43,7 +47,11 @@ public class AuthService(AppSettings appSettings, IEmailProvider emailProvider, 
                 Their email address is '{model.Email}'.
                 """;
             var contacts = appSettings.EmailContacts;
-            await emailProvider.SendAsync(contacts.RegistrationsToName, contacts.RegistrationsToEmail, contacts.WebsiteFromName, contacts.WebsiteFromEmail, "Duplicate website membership registration", body, null, false, contacts.DeveloperEmail);
+
+            foreach (var registrationContact in appSettings.EmailContacts.RegistrationContacts)
+            {
+                await emailProvider.SendAsync(registrationContact.Name, registrationContact.Email, contacts.WebsiteFromName, contacts.WebsiteFromEmail, "Duplicate website membership registration", body, null, false, contacts.DeveloperEmail);
+            }
 
             return new RegisterUserOutput { Result = RegisterUserResult.AlreadyExistsAsPending };
         }

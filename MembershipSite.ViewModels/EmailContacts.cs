@@ -8,14 +8,9 @@ public class EmailContacts
     public string DeveloperEmail { get; set; }
 
     /// <summary>
-    /// Email address to send registration emails to when people create accounts on the website.
+    /// List of email and name pairs address to send registration alerts to when people create accounts on the website.
     /// </summary>
-    public string RegistrationsToEmail { get; set; }
-
-    /// <summary>
-    /// Name to send registration emails to when people create accounts on the website.
-    /// </summary>
-    public string RegistrationsToName { get; set; }
+    public List<EmailAndNamePair> RegistrationContacts { get; set; }
 
     /// <summary>
     /// Email address used as the sender for website emails.
