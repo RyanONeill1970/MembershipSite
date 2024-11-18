@@ -103,7 +103,7 @@ public class AuthController(AuthService authService, ILogger<AuthController> log
         }
 
         // One of those 'should not happen' moments, so log for investigation.
-        logger.LogWarning("ModelState was {ModelStateJson}.", JsonSerializer.Serialize(ModelState));
+        logger.LogWarning("Registration ModelState was {ModelStateJson}. Someone tried to bypass client validation?", JsonSerializer.Serialize(ModelState));
         model.RegistrationError = "Unable to register your account, please contact us.";
         return View(model);
     }
