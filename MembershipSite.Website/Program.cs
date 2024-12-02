@@ -84,12 +84,14 @@ public class Program
         app.UseStaticFiles(); // For normal wwwroot files accessible publicly because we are registered before UseAuthorization.
         app.UseAuthorization();
 
+        // Turn "/secure" (url) into "secure" for local paths.
+        var normalisedSecurePath = appSettings.SecureAreaRoot.Trim(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
         var secureDefaultFileOptions = new DefaultFilesOptions
         {
-            FileProvider = new PhysicalFileProvider(Path.Combine(builder.Environment.ContentRootPath, "secure")),
-            RequestPath = "/secure"
+            FileProvider = new PhysicalFileProvider(Path.Combine(builder.Environment.ContentRootPath, normalisedSecurePath)),
+            RequestPath = appSettings.SecureAreaRoot,
         };
-        secureDefaultFileOptions.RequestPath = "/secure";
+        secureDefaultFileOptions.RequestPath = appSettings.SecureAreaRoot;
         secureDefaultFileOptions.DefaultFileNames.Clear();
         secureDefaultFileOptions.DefaultFileNames.Add("index.html");
         app.UseDefaultFiles(secureDefaultFileOptions);
@@ -105,7 +107,7 @@ public class Program
                 ctx.Context.Response.Headers.Append("Pragma", "no-cache");
                 ctx.Context.Response.Headers.Append("Expires", "-1");
             },
-            RequestPath = "/secure",
+            RequestPath = appSettings.SecureAreaRoot,
         });
 
         // TODO: Trying to figure out the 404 issue that is documented here - https://github.com/dotnet/AspNetCore.Docs/issues/32366

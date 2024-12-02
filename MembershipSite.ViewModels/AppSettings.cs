@@ -17,6 +17,13 @@ public class AppSettings
     public int PasswordResetTokenExpiryDays { get; set; }
 
     /// <summary>
+    /// The rooted URL of the secure folder where password protected static HTML files are stored.
+    /// 
+    /// If let blank will default to /secure.
+    /// </summary>
+    public string SecureAreaRoot { get; set; } = "/secure";
+
+    /// <summary>
     /// Text to be added to the end of the page title for all pages rendered
     /// by the membership aspect of the site (authorisation and admin pages).
     /// 

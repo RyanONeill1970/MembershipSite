@@ -2,7 +2,7 @@
 
 [AllowAnonymous]
 [Route("auth")]
-public class AuthController(AuthService authService, ILogger<AuthController> logger) : Controller
+public class AuthController(AppSettings appSettings, AuthService authService, ILogger<AuthController> logger) : Controller
 {
     [ActionName("forgot-password")]
     [Route("forgot-password", Name = "forgot-password")]
