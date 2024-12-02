@@ -48,6 +48,11 @@ public class AuthController(AppSettings appSettings, AuthService authService, IL
 
             if (loginResult == LoginResult.Success)
             {
+                if (string.IsNullOrWhiteSpace(model.ReturnUrl))
+                {
+                    return Redirect(appSettings.SecureAreaRoot);
+                }
+
                 return this.RedirectToLocal(model.ReturnUrl);
             }
             if (loginResult == LoginResult.Administrator)
