@@ -6,7 +6,7 @@ public class MemberAdminController(MemberAdminService memberAdminService) : Cont
     [ActionName("member-list")]
     [Route("member-list", Name = nameof(MemberList))]
     [HttpGet]
-    public async Task<IActionResult> MemberList()
+    public IActionResult MemberList()
     {
         var model = memberAdminService.AllAsQueryable();
         return View(model);
