@@ -2,19 +2,17 @@ namespace MembershipSite.Website.Controllers;
 
 [AllowAnonymous]
 [Route("")]
-public class HomeController : Controller
+public class HomeController() : Controller
 {
-    [Route("page-not-found")]
-    [ActionName("page-not-found")]
-    public IActionResult PageNotFound()
-    {
-        return View();
-    }
-
     [Route("error")]
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public IActionResult Error()
+    public IActionResult Error(int? statusCode = null)
     {
-        return View();
+        if (!ModelState.IsValid || statusCode == null || statusCode.Value != 404)
+        {
+            return View();
+        }
+
+        return View("page-not-found");
     }
 }

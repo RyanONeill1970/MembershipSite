@@ -49,11 +49,15 @@ public class Program
 
         var app = builder.Build();
 
-        // Configure the HTTP request pipeline.
-        if (!app.Environment.IsDevelopment())
+        if (app.Environment.IsDevelopment())
         {
-            app.UseExceptionHandler("/Home/Error"); // TODO: Check.
+            app.UseDeveloperExceptionPage();
         }
+        else
+        {
+            app.UseExceptionHandler("/error");
+        }
+        app.UseStatusCodePagesWithReExecute("/error", "?statusCode={0}");
 
         // Run migrations before we start accepting connections.
         using (var serviceScope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
