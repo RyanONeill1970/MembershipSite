@@ -110,8 +110,6 @@ public class Program
             RequestPath = appSettings.SecureAreaRoot,
         });
 
-        // TODO: Trying to figure out the 404 issue that is documented here - https://github.com/dotnet/AspNetCore.Docs/issues/32366
-
         // TODO: Following is required as without we get redirect loops. Investigate why.
         app.MapControllerRoute(// CHECKING.
             name: "default",
