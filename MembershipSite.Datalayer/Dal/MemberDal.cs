@@ -1,7 +1,16 @@
 ﻿namespace MembershipSite.Datalayer.Dal;
 
-public class MemberDal(MembershipContext context) : BaseDal<Member>(context)
+public class MemberDal(MembershipContext context) : BaseDal(context)
 {
+    public Member Add(string memberNumber)
+    {
+        var row = new Member{MemberNumber = memberNumber};
+
+        context.Members.Add(row);
+
+        return row;
+    }
+
     public IQueryable<Member> AllAsQueryable()
     {
         return context.Members.AsQueryable();

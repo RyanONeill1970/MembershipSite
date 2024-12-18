@@ -1,0 +1,44 @@
+﻿@model MembershipSite.ViewModels.UploadMembers
+<h1>Upload members</h1>
+
+<p>
+    Upload a CSV file with the following columns:
+</p>
+<ul>
+    <li>Member Number (5 characters maximum)</li>
+    <li>Name (100 characters maximum)</li>
+    <li>Email (100 characters maximum)</li>
+</ul>
+
+<h2>Notes</h2>
+<ul>
+
+    <li>Uploaded members will be added if they do match an existing member number.</li>
+    <li>Uploaded members will be approved if they are not already approved.</li>
+    <li>When a match on member number occurs, name and email fields will be updated to the new values.</li>
+    <li>All fields are trimmed of leading and trailing spaces on upload.</li>
+    <li>Member number can be non-numeric if required and is not case sensitive.</li>
+    <li>Failed uploads (missing data or field too long) will be reported at the end.</li>
+    <li>There must be a header row and it should match the column names listed below.</li>
+</ul>
+
+<p>CSV file sample</p>
+<pre>
+    MemberNumber,Name,Email
+    12345,John Doe,john@example.com
+    23456,Jane Doe,jane@example.com
+    34567,Jim Doe,jim@example.com
+</pre>
+
+<form method="post" enctype="multipart/form-data">
+    <div class="form-group">
+        <label for="file">Select CSV file</label>
+        <input type="file" class="form-control-file" id="file" required asp-for="File" accept=".csv">
+        <span asp-validation-for="File"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Upload</button>
+</form>
+
+@section scripts
+{
+}

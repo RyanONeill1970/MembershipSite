@@ -10,7 +10,7 @@ public class Member
 
     public bool IsApproved { get; set; }
 
-    public string MemberNumber { get; set; } = "";
+    public required string MemberNumber { get; set; }
 
     public string Name { get; set; } = "";
 

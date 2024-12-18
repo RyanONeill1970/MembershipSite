@@ -12,4 +12,25 @@ public class BackstageController(MemberAdminService memberAdminService) : Contro
         var model = memberAdminService.AllAsQueryable();
         return View(model);
     }
+
+    [ActionName("upload-members")]
+    [Route("upload-members")]
+    [HttpGet]
+    public IActionResult UploadMembers()
+    {
+        return View();
+    }
+
+    [ActionName("upload-members")]
+    [Route("upload-members")]
+    [HttpPost]
+    public async Task<IActionResult> UploadMembersAsync(UploadMembers model)
+    {
+        if (ModelState.IsValid)
+        {
+            await memberAdminService.UploadMembersAsync(model.File!);
+        }
+
+        return View(model);
+    }
 }

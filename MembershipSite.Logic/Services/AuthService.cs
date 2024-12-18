@@ -9,13 +9,12 @@ public class AuthService(AppSettings appSettings, IEmailProvider emailProvider, 
         if (member is null)
         {
             // User does not exist - register as pending and email webmaster.
-            member = memberDal.Add();
+            member = memberDal.Add(model.MemberNumber);
 
             member.DateRegistered = DateTimeOffset.UtcNow;
             member.Email = model.Email;
             member.IsAdmin = false;
             member.IsApproved = false;
-            member.MemberNumber = model.MemberNumber;
             member.Name = model.Name;
             member.PasswordHash = PasswordValidator.HashPassword(model.Password);
 
