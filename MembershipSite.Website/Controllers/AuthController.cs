@@ -59,7 +59,7 @@ public class AuthController(AppSettings appSettings, AuthService authService, IL
             {
                 if (string.IsNullOrWhiteSpace(model.ReturnUrl))
                 {
-                    return RedirectToRoute(nameof(MemberAdminController.MemberList));
+                    return RedirectToRoute(nameof(BackstageController.MemberList));
                 }
 
                 return this.RedirectToLocal(model.ReturnUrl);

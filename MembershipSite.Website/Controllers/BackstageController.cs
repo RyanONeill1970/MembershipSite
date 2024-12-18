@@ -1,7 +1,8 @@
 ﻿namespace MembershipSite.Website.Controllers;
 
 [Authorize(Roles = RoleNames.MemberAdmin)]
-public class MemberAdminController(MemberAdminService memberAdminService) : Controller
+[Route("backstage")]
+public class BackstageController(MemberAdminService memberAdminService) : Controller
 {
     [ActionName("member-list")]
     [Route("member-list", Name = nameof(MemberList))]
