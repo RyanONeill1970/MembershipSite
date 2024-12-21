@@ -30,8 +30,8 @@ public class MemberAdminService(MemberDal memberDal)
 
             if (errors.Count > 0)
             {
-                result.Errors.AddRange(errors);
-                result.Failed++;
+                result.Failed.AddRange(errors);
+                result.Detail.AddRange(errors);
                 continue;
             }
 
@@ -44,11 +44,16 @@ public class MemberAdminService(MemberDal memberDal)
                 existingMember = memberDal.Add(record.MemberNumber);
                 existingMember.IsAdmin = false;
                 existingMember.DateRegistered = DateTimeOffset.Now;
-                result.Added++;
+
+                var logLine = $"Member number {existingMember.MemberNumber} added.";
+                result.Added.Add(logLine);
+                result.Detail.Add(logLine);
             }
             else
             {
-                result.Updated++;
+                var logLine = $"Member number {existingMember.MemberNumber} updated.";
+                result.Updated.Add(logLine);
+                result.Detail.Add(logLine);
             }
 
             existingMember.Email = record.Email;
@@ -84,32 +89,32 @@ public class MemberAdminService(MemberDal memberDal)
 
         if (string.IsNullOrWhiteSpace(record.Email))
         {
-            errors.Add($"Row {rowIndex} missing email.");
+            errors.Add($"Row {rowIndex} missing email. Data was '{record}'.");
         }
 
         if (string.IsNullOrWhiteSpace(record.MemberNumber))
         {
-            errors.Add($"Row {rowIndex} missing member number.");
+            errors.Add($"Row {rowIndex} missing member number. Data was '{{record}}'.");
         }
 
         if (string.IsNullOrWhiteSpace(record.Name))
         {
-            errors.Add($"Row {rowIndex} missing name.");
+            errors.Add($"Row {rowIndex} missing name. Data was '{{record}}'.");
         }
 
         if (record.Email.Length > MemberFieldLimits.Email)
         {
-            errors.Add($"Row {rowIndex} email too long at {record.Email.Length} characters (maximum {MemberFieldLimits.Email}).");
+            errors.Add($"Row {rowIndex} email too long at {record.Email.Length} characters (maximum {MemberFieldLimits.Email}). Data was '{record}'.");
         }
 
         if (record.Name.Length > MemberFieldLimits.Name)
         {
-            errors.Add($"Row {rowIndex} name too long at {record.Name.Length} characters (maximum {MemberFieldLimits.Name}).");
+            errors.Add($"Row {rowIndex} name too long at {record.Name.Length} characters (maximum {MemberFieldLimits.Name}). Data was '{record}'.");
         }
 
         if (record.MemberNumber.Length > MemberFieldLimits.MemberNumber)
         {
-            errors.Add($"Row {rowIndex} member number too long at {record.MemberNumber.Length} characters (maximum {MemberFieldLimits.MemberNumber}).");
+            errors.Add($"Row {rowIndex} member number too long at {record.MemberNumber.Length} characters (maximum {MemberFieldLimits.MemberNumber}). Data was '{record}'.");
         }
 
         return errors;

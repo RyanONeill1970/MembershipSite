@@ -28,7 +28,9 @@ public class BackstageController(MemberAdminService memberAdminService) : Contro
     {
         if (ModelState.IsValid)
         {
-            await memberAdminService.UploadMembersAsync(model.File!);
+            var result =  await memberAdminService.UploadMembersAsync(model.File!);
+
+            return View("upload-members-result", result);
         }
 
         return View(model);

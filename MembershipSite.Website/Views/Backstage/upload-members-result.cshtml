@@ -1,0 +1,23 @@
+﻿@model MembershipSite.ViewModels.MemberCsvUploadResult
+<h1>Result of upload</h1>
+
+<p>
+    The upload process has completed, details are:
+</p>
+<ul>
+    <li>Members added - @Model.Added.Count</li>
+    <li>Members updated - @Model.Updated.Count</li>
+    <li>Errors - @Model.Failed.Count</li>
+</ul>
+
+<h2>Detailed upload report</h2>
+<ul>
+    @foreach (var detailLine in Model.Detail)
+    {
+        <li>@detailLine</li>
+    }
+</ul>
+
+@section scripts
+{
+}

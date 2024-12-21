@@ -1,6 +1,6 @@
 ﻿namespace MembershipSite.Logic.Models;
 
-public class MemberCsvRow
+public record MemberCsvRow
 {
     [CsvHelper.Configuration.Attributes.Name("Email")]
     public string Email { get; set; }
