@@ -1,12 +1,13 @@
 ﻿namespace MembershipSite.Logic.Services;
 
 using CsvHelper;
+using CsvHelper.Configuration;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Globalization;
 using System.Threading.Tasks;
 
-public class MemberAdminService(MemberDal memberDal)
+public class MemberAdminService(ILogger<MemberAdminService> logger, MemberDal memberDal)
 {
     public IQueryable<Member> AllAsQueryable()
     {
@@ -15,17 +16,62 @@ public class MemberAdminService(MemberDal memberDal)
 
     public async Task<MemberCsvUploadResult> UploadMembersAsync(IFormFile file)
     {
-        using var reader = new StreamReader(file.OpenReadStream());
-        using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
-        var records = csv.GetRecords<MemberCsvRow>().ToList();
+        try
+        {
+            using var reader = new StreamReader(file.OpenReadStream());
+            var csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
+            {
+                HasHeaderRecord = true,
+                IgnoreBlankLines = true,
+                PrepareHeaderForMatch = (args) => args.Header.Trim().ToLower(),
+                TrimOptions = TrimOptions.Trim,
+            };
+            using var csvReader = new CsvReader(reader, csvConfig);
+            var records = csvReader.GetRecords<MemberCsvRow>().ToList();
+
+            var result = await ProcessRecords(records);
+
+            return Summarise(result);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error uploading members.");
+
+            var summary = $"Unable to upload the file you supplied. Support has been emailed. In case it helps, the error is below.";
+
+            return new MemberCsvUploadResult { 
+                Error = ex.Message,
+                Summary = summary
+            };
+        }
+    }
+
+    private static MemberCsvUploadResult Summarise(MemberCsvUploadResult result)
+    {
+        if (result.Detail.Count == 0)
+        {
+            result.Summary = "No records processed.";
+        }
+        else if (result.Failed.Count == 0)
+        {
+            result.Summary = "All records processed successfully.";
+        }
+        else
+        {
+            result.Summary = $"{result.Failed.Count} records failed to process. Please check the details.";
+        }
+
+        return result;
+    }
+
+    private async Task<MemberCsvUploadResult> ProcessRecords(List<MemberCsvRow> records)
+    {
         var members = await memberDal.AllAsQueryable().ToListAsync();
         var rowIndex = 0;
         var result = new MemberCsvUploadResult();
 
         foreach (var record in records)
         {
-            TrimFields(record);
-
             var errors = ValidateCsvRecord(record, rowIndex);
 
             if (errors.Count > 0)
@@ -62,20 +108,7 @@ public class MemberAdminService(MemberDal memberDal)
         }
 
         await memberDal.CommitAsync();
-
         return result;
-    }
-
-    private static void TrimFields(MemberCsvRow record)
-    {
-        if (record is null)
-        {
-            return;
-        }
-
-        record.Email = record.Email.Trim();
-        record.MemberNumber = record.MemberNumber.Trim();
-        record.Name = record.Name.Trim();
     }
 
     private static List<string> ValidateCsvRecord(MemberCsvRow record, int rowIndex)

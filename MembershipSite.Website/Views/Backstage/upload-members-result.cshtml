@@ -2,21 +2,30 @@
 <h1>Result of upload</h1>
 
 <p>
-    The upload process has completed, details are:
+    The upload process has completed.
 </p>
+<h2>In summary - @Model.Summary</h2>
 <ul>
     <li>Members added - @Model.Added.Count</li>
     <li>Members updated - @Model.Updated.Count</li>
-    <li>Errors - @Model.Failed.Count</li>
+    <li>Row import errors - @Model.Failed.Count</li>
 </ul>
 
-<h2>Detailed upload report</h2>
-<ul>
-    @foreach (var detailLine in Model.Detail)
-    {
-        <li>@detailLine</li>
-    }
-</ul>
+@if (Model.Detail.Count > 0)
+{
+    <h2>Detailed upload report</h2>
+    <ul>
+        @foreach (var detailLine in Model.Detail)
+        {
+            <li>@detailLine</li>
+        }
+    </ul>
+}
+
+@if (!string.IsNullOrWhiteSpace(Model.Error))
+{
+    <p class="text-danger">@Model.Error</p>
+})
 
 @section scripts
 {
