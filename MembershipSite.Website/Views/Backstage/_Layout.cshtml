@@ -22,7 +22,7 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/backstage/">Member admin home</a>
+                        <a class="nav-link active" href="/backstage/">Admin home</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/backstage/member-list">Member list</a>
@@ -38,8 +38,14 @@
                         <a class="nav-link" href="/backstage/status">System status</a>
                     </li>
                     <li>
-                        @* TODO: Need to embed class="nav-link" in the tag helper. Maybe create a helper of the form <a mws-login-url="/blah" etc *@
-                        <mws:loginLinks />
+                        @if (User.Identity is not null && User.Identity.IsAuthenticated)
+                        {
+                            <a class="nav-link" href="/auth/logout">Log out</a>
+                        }
+                        else
+                        {
+                            <a class="nav-link" href="/auth/login">Log in</a>
+                        }
                     </li>
 @*                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
