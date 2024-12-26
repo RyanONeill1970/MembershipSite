@@ -1,0 +1,88 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@ViewData["Title"]</title>
+    <link href="/favicon.ico" rel="icon" type="image/x-icon" />
+    <link href="/css/site.css" rel="stylesheet">
+    <link href="/lib/bootstrap-icons/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+    @await RenderSectionAsync("headEnd", required: false)
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <img src="/Bfhs4.svg" alt="" width="30" height="24" class="d-inline-block align-text-top">
+                Admin
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/backstage/">Member admin home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/backstage/member-list">Member list</a>
+                    </li>
+                    <li>
+                        <a class="nav-link" href="/backstage/audit">Audit</a>
+                    </li>
+                    <li>
+                        <a class="nav-link" href="/backstage/documentation">Documentation</a>
+                    </li>
+                    <li>
+                        @* TODO: Either show status red/green/yellow or have as home page for admin so status is visible at a glance. *@
+                        <a class="nav-link" href="/backstage/status">System status</a>
+                    </li>
+                    <li>
+                        @* TODO: Need to embed class="nav-link" in the tag helper. Maybe create a helper of the form <a mws-login-url="/blah" etc *@
+                        <mws:loginLinks />
+                    </li>
+@*                     <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Dropdown
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="#">Action</a></li>
+                            <li><a class="dropdown-item" href="#">Another action</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#">Something else here</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+                    </li>
+ *@                </ul>
+ @* TODO: Implement search. What would we search? *@
+                <form class="d-flex">
+                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                    <button class="btn btn-outline-success" type="submit">Search</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+@*
+
+ *@
+
+    @RenderBody()
+
+    <environment include="Development">
+        <script src="/lib/bootstrap/js/bootstrap.bundle.js"></script>
+        <script src="/lib/aspnet-validation.js"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+        <script src="/lib/aspnet-validation.min.js"></script>
+    </environment>
+
+    @* TODO: Move to dev / bundle *@
+    <script src="/js/validator-bridge.js"></script>
+
+    @await RenderSectionAsync("scripts", required: false)
+</body>
+</html>
