@@ -3,11 +3,9 @@
 public class ThemeViewLocator : IViewLocationExpander
 {
     /// <summary>
-    /// Changes the view path location to look in the theme folder.
+    /// Changes the view path location to look in the current view folder first, then the theme folder, and then fails over to the shared folder.
     /// 
-    /// Prioritises the theme and fails over to the default layout.
-    /// 
-    /// The .Net framework will use the returned template strings.
+    /// .Net will use the returned template strings.
     /// </summary>
     /// <param name="context"></param>
     /// <param name="viewLocations">
@@ -16,16 +14,19 @@ public class ThemeViewLocator : IViewLocationExpander
     ///   /Views/Shared/{0}.cshtml
     /// </param>
     /// <returns>
-    /// A modified list of view paths adjusted to place the theme folder as the first element.
+    /// A modified list of view paths adjusted to place the current view folder first, then the theme folder, and then the shared folder.
     /// For example, the above will be translated to;
+    ///   /Views/{1}/{0}.cshtml
     ///   /theme/{0}.cshtml
     ///   /Views/Shared/{0}.cshtml
     /// </returns>
     public IEnumerable<string> ExpandViewLocations(ViewLocationExpanderContext context, IEnumerable<string> viewLocations)
     {
+        var currentViewLocation = "/Views/{1}/{0}.cshtml";
         var themeLocation = "/theme/{0}.cshtml";
+        var sharedLocation = "/Views/Shared/{0}.cshtml";
 
-        return new[] { themeLocation }.Concat(viewLocations);
+        return [currentViewLocation, themeLocation, sharedLocation];
     }
 
     /// <summary>
