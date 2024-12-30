@@ -9,6 +9,14 @@
     {
       "library": "bootstrap-icons@1.11.3",
       "destination": "wwwroot/lib/bootstrap-icons/"
+    },
+    {
+      "library": "tabulator-tables@6.3.0",
+      "destination": "wwwroot/lib/tabulator-tables/"
+    },
+    {
+      "library": "luxon@3.5.0",
+      "destination": "wwwroot/lib/luxon/"
     }
   ]
 }

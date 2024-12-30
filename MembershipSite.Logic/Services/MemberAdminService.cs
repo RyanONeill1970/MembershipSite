@@ -39,7 +39,8 @@ public class MemberAdminService(ILogger<MemberAdminService> logger, MemberDal me
 
             var summary = $"Unable to upload the file you supplied. Support has been emailed. In case it helps, the error is below.";
 
-            return new MemberCsvUploadResult { 
+            return new MemberCsvUploadResult
+            {
                 Error = ex.Message,
                 Summary = summary
             };
@@ -151,5 +152,21 @@ public class MemberAdminService(ILogger<MemberAdminService> logger, MemberDal me
         }
 
         return errors;
+    }
+
+    public async Task<List<MemberSummaryRow>> MemberAdminSummaryAsync()
+    {
+        var members = await memberDal.AllAsQueryable().ToListAsync();
+
+        return members
+            .Select(m => new MemberSummaryRow
+            {
+                Email = m.Email,
+                IsApproved = m.IsApproved,
+                DateRegistered = m.DateRegistered,
+                MemberNumber = m.MemberNumber,
+                Name = m.Name,
+            })
+            .ToList();
     }
 }

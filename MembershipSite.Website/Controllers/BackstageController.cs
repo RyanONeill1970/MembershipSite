@@ -9,8 +9,27 @@ public class BackstageController(MemberAdminService memberAdminService) : Contro
     [HttpGet]
     public IActionResult MemberList()
     {
+        // TODO: Model probably not needed now. Or at least model data is not.
         var model = memberAdminService.AllAsQueryable();
         return View(model);
+    }
+
+    [ActionName("member-list-2")]
+    [Route("member-list-2", Name = nameof(MemberList2))]
+    [HttpGet]
+    public IActionResult MemberList2()
+    {
+        return View();
+    }
+
+    // TODO: Pass back everything for now, then add server side filtering, sorting and paging.
+    [ActionName("member-grid-data")]
+    [Route("member-grid-data", Name = nameof(MemberGridDataAsync))]
+    [HttpGet]
+    public async Task<JsonResult> MemberGridDataAsync()
+    {
+        var members = await memberAdminService.MemberAdminSummaryAsync();
+        return Json(members);
     }
 
     [ActionName("upload-members")]
