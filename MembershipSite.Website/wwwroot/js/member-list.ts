@@ -4,8 +4,8 @@
     declare let MvcGrid: any;
 
     export class MemberList {
-        private approveAllTicked = document.getElementById("approve-all-ticked");
-        private revokeAllTicked = document.getElementById("revoke-all-ticked");
+        private readonly approveAllTicked = document.getElementById("approve-all-ticked");
+        private readonly revokeAllTicked = document.getElementById("revoke-all-ticked");
 
         public static Init(): MemberList {
             return new MemberList();
