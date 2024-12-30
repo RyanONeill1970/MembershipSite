@@ -15,6 +15,7 @@ public class BackstageController(MemberAdminService memberAdminService) : Contro
     }
 
     [ActionName("member-list-2")]
+    [Route("")]
     [Route("member-list-2", Name = nameof(MemberList2))]
     [HttpGet]
     public IActionResult MemberList2()
