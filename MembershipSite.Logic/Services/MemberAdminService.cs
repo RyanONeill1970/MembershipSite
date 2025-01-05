@@ -169,8 +169,6 @@ public class MemberAdminService(AppSettings appSettings, IEmailProvider emailPro
 
     public async Task SaveMemberDataAsync(List<MemberSummaryRow> members)
     {
-        // TODO: Run through validation and return errors. Also, return summary like member upload does for number of edits etc.
-
         ProcessDeletes(members);
         await ProcessUpdates(members);
         await memberDal.CommitAsync();
