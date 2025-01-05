@@ -173,7 +173,7 @@ public class AuthService(AppSettings appSettings, IEmailProvider emailProvider, 
 
         if (!PasswordResetGuidIsValid(member))
         {
-            // TODO: Should instrument this for the admin.
+            AppLogging.Write($"Password reset token is invalid. Model passed was {model.ToJson()}");
             return false;
         }
 
