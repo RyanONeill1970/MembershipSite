@@ -110,8 +110,7 @@ public class Program
             RequestPath = appSettings.SecureAreaRoot,
         });
 
-        // TODO: Following is required as without we get redirect loops. Investigate why.
-        app.MapControllerRoute(// CHECKING.
+        app.MapControllerRoute(
             name: "default",
             pattern: "{controller=Home}/{action=Index}/{id?}");
 
