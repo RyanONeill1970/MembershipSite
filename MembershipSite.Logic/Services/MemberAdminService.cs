@@ -2,7 +2,6 @@
 
 using CsvHelper;
 using CsvHelper.Configuration;
-using MembershipSite.Datalayer.Models;
 using MembershipSite.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -12,11 +11,6 @@ using System.Threading.Tasks;
 
 public class MemberAdminService(AppSettings appSettings, IEmailProvider emailProvider, IHttpContextAccessor httpContextAccessor, ILogger<MemberAdminService> logger, MemberDal memberDal)
 {
-    public IQueryable<Member> AllAsQueryable()
-    {
-        return memberDal.AllAsQueryable();
-    }
-
     public async Task<MemberCsvUploadResult> UploadMembersAsync(IFormFile file)
     {
         try
