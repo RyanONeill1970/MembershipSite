@@ -1,13 +1,4 @@
 ﻿namespace MembershipSite.MemberAdmin {
-
-    /*
-TODO:
-    Save data, with save feedback.
-    Option to add data as a row - see https://tabulator.info/docs/6.3/update#alter-add
-    Show a BS modal with form to add a new member.
-    Delete row needed.
-*/
-
     export class MemberList {
         private readonly grid = document.getElementById("member-grid");
         private table: any;

@@ -2,13 +2,6 @@ var MembershipSite;
 (function (MembershipSite) {
     var MemberAdmin;
     (function (MemberAdmin) {
-        /*
-    TODO:
-        Save data, with save feedback.
-        Option to add data as a row - see https://tabulator.info/docs/6.3/update#alter-add
-        Show a BS modal with form to add a new member.
-        Delete row needed.
-    */
         class MemberList {
             static Init() {
                 return new MemberList();
