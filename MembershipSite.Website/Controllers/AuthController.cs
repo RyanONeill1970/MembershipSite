@@ -75,6 +75,14 @@ public class AuthController(AppSettings appSettings, AuthService authService, IL
     public async Task<IActionResult> Logout()
     {
         await authService.LogoutAsync();
+        return RedirectToRoute(nameof(LoggedOut));
+    }
+
+    [Route("logged-out", Name = nameof(LoggedOut))]
+    [ActionName("logged-out")]
+    [HttpGet]
+    public IActionResult LoggedOut()
+    {
         return View();
     }
 
