@@ -171,9 +171,15 @@ public class AuthService(AppSettings appSettings, IEmailProvider emailProvider, 
     {
         var member = await memberDal.ByPasswordResetTokenAsync(model.PasswordResetToken);
 
+        if (member is null)
+        {
+            AppLogging.Write($"Password reset token does not link to member. Token passed was {model.PasswordResetToken}.");
+            return false;
+        }
+
         if (!PasswordResetGuidIsValid(member))
         {
-            AppLogging.Write($"Password reset token is invalid. Model passed was {model.ToJson()}");
+            AppLogging.Write($"Password reset token is invalid. Token passed was {model.PasswordResetToken}.");
             return false;
         }
 
