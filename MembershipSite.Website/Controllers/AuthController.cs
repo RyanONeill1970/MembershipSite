@@ -189,7 +189,6 @@ public class AuthController(AppSettings appSettings, AuthService authService, IL
                 return RedirectToRoute(nameof(PasswordHasBeenSet));
             }
 
-            // TODO: Could do with instrumenting this. If end users see this, it's annoying and painful to debug.
             ModelState.AddModelError(nameof(SetPasswordViewModel.Password), "Unable to set your password. Please try again.");
         }
 
