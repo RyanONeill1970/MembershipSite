@@ -2,12 +2,15 @@
 
 using CsvHelper;
 using CsvHelper.Configuration;
+using MembershipSite.Datalayer.Models;
+using MembershipSite.ViewModels;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Globalization;
 using System.Threading.Tasks;
 
-public class MemberAdminService(ILogger<MemberAdminService> logger, MemberDal memberDal)
+public class MemberAdminService(AppSettings appSettings, IEmailProvider emailProvider, IHttpContextAccessor httpContextAccessor, ILogger<MemberAdminService> logger, MemberDal memberDal)
 {
     public IQueryable<Member> AllAsQueryable()
     {
@@ -168,5 +171,79 @@ public class MemberAdminService(ILogger<MemberAdminService> logger, MemberDal me
                 Name = m.Name,
             })
             .ToList();
+    }
+
+    public async Task SaveMemberDataAsync(List<MemberSummaryRow> members)
+    {
+        // TODO: Run through validation and return errors. Also, return summary like member upload does for number of edits etc.
+
+        ProcessDeletes(members);
+        await ProcessUpdates(members);
+        await memberDal.CommitAsync();
+
+        // Do this last as if the above fails, we don't want to send emails.
+        await ProcessApprovalEmails(members);
+    }
+
+    private async Task ProcessApprovalEmails(List<MemberSummaryRow> members)
+    {
+        var httpContext = httpContextAccessor.HttpContext!;
+        var websiteUrl = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}";
+        var subject = $"{appSettings.ApplicationName} - membership access.";
+
+        var toApprove = members
+            .Where(m => m.ApproveAndSendEmail)
+            .ToList();
+
+        foreach (var member in toApprove)
+        {
+            var body = $"""
+                Your membership has been approved and you can now log in to the website.
+
+                Please visit {websiteUrl}
+
+                If you did not request this, please ignore this email.
+
+                Thank you,
+
+                The {appSettings.ApplicationName} team.
+                """;
+            await emailProvider.SendAsync(member.Name, member.Email, appSettings.EmailContacts.WebsiteFromName, appSettings.EmailContacts.WebsiteFromEmail, subject, body, [], false, appSettings.EmailContacts.DeveloperEmail);
+        }
+    }
+
+    private async Task ProcessUpdates(List<MemberSummaryRow> members)
+    {
+        var changed = members
+            .Where(m => m.IsDirty)
+            .Where(m => !m.PendingDelete)
+            .ToList();
+
+        foreach (var row in changed)
+        {
+            var member = await memberDal.ByMembershipNumberAsync(row.MemberNumber);
+
+            if (member is null)
+            {
+                member = memberDal.Add(row.MemberNumber);
+                member.DateRegistered = DateTimeOffset.Now;
+            }
+
+            member.Email = row.Email;
+            member.IsApproved = row.IsApproved;
+            member.Name = row.Name;
+        }
+    }
+
+    private void ProcessDeletes(List<MemberSummaryRow> members)
+    {
+        var toDelete = members
+            .Where(m => m.PendingDelete)
+            .ToList();
+
+        foreach (var row in toDelete)
+        {
+            memberDal.Delete(row.MemberNumber);
+        }
     }
 }

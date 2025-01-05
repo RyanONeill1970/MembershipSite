@@ -5,7 +5,6 @@ var MembershipSite;
         /*
     TODO:
         Save data, with save feedback.
-            Needs to show overlay with spinner while saving.
         Option to add data as a row - see https://tabulator.info/docs/6.3/update#alter-add
         Show a BS modal with form to add a new member.
         Delete row needed.
@@ -25,13 +24,12 @@ var MembershipSite;
                 return parseInt(document.getElementById(id).value);
             }
             createGrid() {
-                const fieldLimitMemberNumber = this.parseField("field-limit-member-number");
                 const fieldLimitName = this.parseField("field-limit-name");
                 const fieldLimitEmail = this.parseField("field-limit-email");
                 this.table = new Tabulator(this.grid, {
                     ajaxURL: "/backstage/member-grid-data",
                     columns: [
-                        { title: "Member Number", field: "memberNumber", hozAlign: "right", sorter: "number", editor: "input", validator: [`maxLength:${fieldLimitMemberNumber}`, "required"], headerFilter: true },
+                        { title: "Member Number", field: "memberNumber", hozAlign: "right", sorter: "number", headerFilter: true },
                         { title: "Name", field: "name", editor: "input", validator: [`maxLength:${fieldLimitName}`, "required"], headerFilter: true },
                         { title: "Email", field: "email", editor: "input", validator: [`maxLength:${fieldLimitEmail}`, "required"], headerFilter: true },
                         {
@@ -76,17 +74,43 @@ var MembershipSite;
                 document.getElementById("cancel-button").addEventListener("click", () => {
                     this.table.setData();
                 });
-                document.getElementById("save-button").addEventListener("click", () => {
-                    // TODO: Track state of data and only enable button when data has changed.
-                    // Also add POST to save data.
-                    this.table.getData();
+                document.getElementById("save-button").addEventListener("click", () => this.saveData());
+            }
+            async saveData() {
+                const data = this.table.getData();
+                try {
                     this.table.alert("Saving data.");
-                });
+                    const response = await fetch("/backstage/save-member-data", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(data),
+                    });
+                    if (response.ok) {
+                        // Reload data from the server.
+                        this.table.setData();
+                    }
+                    else {
+                        this.table.alert(`Error saving data. This has been logged. ${this.closeLink()}`);
+                        MemberAdmin.IssueLogger.log("Error saving data", "saveData", { response });
+                    }
+                }
+                catch (error) {
+                    this.table.alert(`Exception saving data. This has been logged. ${this.closeLink()}`);
+                    MemberAdmin.IssueLogger.log("Exception saving data", "saveData", { error });
+                }
+            }
+            closeLink() {
+                return "<a href='javascript:window.currentPage.table.clearAlert()'>Close</a>";
             }
             cellEdited(cell) {
                 const rowData = cell.getData();
                 rowData.isDirty = true;
-                rowData.approveAndSendEmail = true;
+                if (cell.fieldName === "isApproved" && rowData.isApproved === false) {
+                    // Approve turned off, so also turn off the 'send email' flag.
+                    rowData.approveAndSendEmail = false;
+                }
                 this.table.updateData([rowData]);
             }
             dataChanged(data) {
@@ -155,6 +179,7 @@ var MembershipSite;
                 const row = this.table.getRow(memberNumber);
                 const rowData = row.getData();
                 rowData.isDirty = true;
+                rowData.isApproved = true;
                 rowData.approveAndSendEmail = true;
                 this.table.updateData([rowData]);
                 this.closeNearestDropdown(approveMenuItem);

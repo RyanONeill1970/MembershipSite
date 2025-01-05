@@ -4,7 +4,7 @@ public class MemberDal(MembershipContext context) : BaseDal(context)
 {
     public Member Add(string memberNumber)
     {
-        var row = new Member{MemberNumber = memberNumber};
+        var row = new Member { MemberNumber = memberNumber };
 
         context.Members.Add(row);
 
@@ -38,5 +38,13 @@ public class MemberDal(MembershipContext context) : BaseDal(context)
             .Members
             .Where(m => m.PasswordResetToken == passwordResetToken)
             .FirstOrDefaultAsync();
+    }
+
+    public void Delete(string memberNumber)
+    {
+        context
+            .Members
+            .Where(m => m.MemberNumber == memberNumber)
+            .ExecuteDelete();
     }
 }

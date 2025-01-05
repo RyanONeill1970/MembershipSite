@@ -23,7 +23,6 @@ public class BackstageController(MemberAdminService memberAdminService) : Contro
         return View();
     }
 
-    // TODO: Pass back everything for now, then add server side filtering, sorting and paging.
     [ActionName("member-grid-data")]
     [Route("member-grid-data", Name = nameof(MemberGridDataAsync))]
     [HttpGet]
@@ -31,6 +30,20 @@ public class BackstageController(MemberAdminService memberAdminService) : Contro
     {
         var members = await memberAdminService.MemberAdminSummaryAsync();
         return Json(members);
+    }
+
+    [ActionName("save-member-data")]
+    [Route("save-member-data")]
+    [HttpPost]
+    public async Task<IActionResult> SaveMemberDataAsync([FromBody] List<MemberSummaryRow> model)
+    {
+        if (ModelState.IsValid)
+        {
+            await memberAdminService.SaveMemberDataAsync(model);
+            return Ok();
+        }
+
+        return BadRequest();
     }
 
     [ActionName("upload-members")]
@@ -48,7 +61,7 @@ public class BackstageController(MemberAdminService memberAdminService) : Contro
     {
         if (ModelState.IsValid)
         {
-            var result =  await memberAdminService.UploadMembersAsync(model.File!);
+            var result = await memberAdminService.UploadMembersAsync(model.File!);
 
             return View("upload-members-result", result);
         }

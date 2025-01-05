@@ -1,6 +1,4 @@
-﻿@model MemberListViewModel
-
-@section headEnd
+﻿@section headEnd
 {
     <link href="/lib/tabulator-tables/css/tabulator_bootstrap5.css" rel="stylesheet">
 }
@@ -46,7 +44,6 @@
     </div>
 </div>
 
-<input type="hidden" id="field-limit-member-number" value="@MemberFieldLimits.MemberNumber" />
 <input type="hidden" id="field-limit-name" value="@MemberFieldLimits.Name" />
 <input type="hidden" id="field-limit-email" value="@MemberFieldLimits.Email" />
 
@@ -59,9 +56,10 @@
     <script type="text/javascript" src="/lib/luxon/luxon.js"></script>
     <script type="text/javascript" src="/lib/tabulator-tables/js/tabulator.js"></script>
 
+    <script src="/js/issue-logger.js"></script>
     <script src="/js/member-list-2.js"></script>
 
     <script>
-        MembershipSite.MemberAdmin.MemberList2.Init();
+        window.currentPage = MembershipSite.MemberAdmin.MemberList2.Init();
     </script>
 }

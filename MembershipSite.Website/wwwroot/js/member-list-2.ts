@@ -3,7 +3,6 @@
     /*
 TODO:
     Save data, with save feedback.
-        Needs to show overlay with spinner while saving.
     Option to add data as a row - see https://tabulator.info/docs/6.3/update#alter-add
     Show a BS modal with form to add a new member.
     Delete row needed.
@@ -31,7 +30,6 @@ TODO:
 
         private createGrid(): void {
 
-            const fieldLimitMemberNumber = this.parseField("field-limit-member-number");
             const fieldLimitName = this.parseField("field-limit-name");
             const fieldLimitEmail = this.parseField("field-limit-email");
 
@@ -39,7 +37,7 @@ TODO:
                 ajaxURL: "/backstage/member-grid-data",
                 columns:
                     [
-                        { title: "Member Number", field: "memberNumber", hozAlign: "right", sorter: "number", editor: "input", validator: [`maxLength:${fieldLimitMemberNumber}`, "required"], headerFilter: true },
+                        { title: "Member Number", field: "memberNumber", hozAlign: "right", sorter: "number", headerFilter: true },
                         { title: "Name", field: "name", editor: "input", validator: [`maxLength:${fieldLimitName}`, "required"], headerFilter: true },
                         { title: "Email", field: "email", editor: "input", validator: [`maxLength:${fieldLimitEmail}`, "required"], headerFilter: true },
                         {
@@ -84,25 +82,54 @@ TODO:
             window.addEventListener('resize', () => this.adjustGridPadding());
         }
 
-        private wireUpSaveAndCancelButtons() :void {
+        private wireUpSaveAndCancelButtons(): void {
             document.getElementById("cancel-button").addEventListener("click", () => {
                 this.table.setData();
             });
 
-            document.getElementById("save-button").addEventListener("click", () => {
-                // TODO: Track state of data and only enable button when data has changed.
-                // Also add POST to save data.
-                this.table.getData();
+            document.getElementById("save-button").addEventListener("click", () => this.saveData());
+        }
 
+        private async saveData(): Promise<void> {
+            const data = this.table.getData();
+
+            try {
                 this.table.alert("Saving data.");
-            });
+
+                const response = await fetch("/backstage/save-member-data", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                if (response.ok) {
+                    // Reload data from the server.
+                    this.table.setData();
+                } else {
+                    this.table.alert(`Error saving data. This has been logged. ${this.closeLink()}`);
+                    IssueLogger.log("Error saving data", "saveData", { response });
+                }
+            } catch (error) {
+                this.table.alert(`Exception saving data. This has been logged. ${this.closeLink()}`);
+                IssueLogger.log("Exception saving data", "saveData", { error });
+            }
+        }
+
+        private closeLink(): string {
+            return "<a href='javascript:window.currentPage.table.clearAlert()'>Close</a>";
         }
 
         private cellEdited(cell: any): void {
             const rowData = cell.getData();
 
             rowData.isDirty = true;
-            rowData.approveAndSendEmail = true;
+
+            if (cell.fieldName === "isApproved" && rowData.isApproved === false) {
+                // Approve turned off, so also turn off the 'send email' flag.
+                rowData.approveAndSendEmail = false;
+            }
 
             this.table.updateData([rowData]);
         }
@@ -189,6 +216,7 @@ TODO:
             const rowData = row.getData();
 
             rowData.isDirty = true;
+            rowData.isApproved = true;
             rowData.approveAndSendEmail = true;
 
             this.table.updateData([rowData]);
