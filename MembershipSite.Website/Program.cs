@@ -66,9 +66,6 @@ public class Program
             await context.Database.MigrateAsync();
         }
 
-        // TODO: Re-enable.
-        //app.UseHttpsRedirection();
-
         // If requester does not specify a file, use index.html
         var options = new DefaultFilesOptions();
         options.DefaultFileNames.Clear();
