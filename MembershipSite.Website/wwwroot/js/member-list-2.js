@@ -4,30 +4,22 @@ var MembershipSite;
     (function (MemberAdmin) {
         /*
     TODO:
-      Have approved as green background?
-      Allow inline editing and postback.
-      Format date.
-      Look at styles used in tabulator samples.
-    Save data, with save feedback.
-    Checkbox row selector for selecting multiple rows and running action.
-    Check paging out with large data set. How does filtering / multi-select tick boxes work with paging?
-    Option to add data as a row - see https://tabulator.info/docs/6.3/update#alter-add
+        Save data, with save feedback.
+            Needs to show overlay with spinner while saving.
+        Option to add data as a row - see https://tabulator.info/docs/6.3/update#alter-add
         Show a BS modal with form to add a new member.
         Delete row needed.
-            Warn when deleting current user?
     */
         class MemberList2 {
             static Init() {
                 return new MemberList2();
             }
             constructor() {
-                this.approveAllTicked = document.getElementById("approve-all-ticked");
-                this.revokeAllTicked = document.getElementById("revoke-all-ticked");
+                this.grid = document.getElementById("member-grid");
                 this.WireUpUi();
             }
             WireUpUi() {
                 this.createGrid();
-                //this.createCheckboxListeners();
             }
             parseField(id) {
                 return parseInt(document.getElementById(id).value);
@@ -36,11 +28,9 @@ var MembershipSite;
                 const fieldLimitMemberNumber = this.parseField("field-limit-member-number");
                 const fieldLimitName = this.parseField("field-limit-name");
                 const fieldLimitEmail = this.parseField("field-limit-email");
-                this.table = new Tabulator("#member-grid", {
+                this.table = new Tabulator(this.grid, {
                     ajaxURL: "/backstage/member-grid-data",
-                    layout: "fitColumns",
                     columns: [
-                        { title: "Row", formatter: "rownum", field: "rownum", accessor: "rownum", headerFilter: true },
                         { title: "Member Number", field: "memberNumber", hozAlign: "right", sorter: "number", editor: "input", validator: [`maxLength:${fieldLimitMemberNumber}`, "required"], headerFilter: true },
                         { title: "Name", field: "name", editor: "input", validator: [`maxLength:${fieldLimitName}`, "required"], headerFilter: true },
                         { title: "Email", field: "email", editor: "input", validator: [`maxLength:${fieldLimitEmail}`, "required"], headerFilter: true },
@@ -49,7 +39,7 @@ var MembershipSite;
                             formatterParams: { clickable: true }
                         },
                         {
-                            title: "Registered", field: "dateRegistered", headerFilter: true, formatter: "datetime",
+                            title: "Registered", field: "dateRegistered", headerFilter: false, formatter: "datetime",
                             formatterParams: {
                                 inputFormat: "iso",
                                 outputFormat: "dd/MM/yyyy HH:mm:ss",
@@ -60,49 +50,29 @@ var MembershipSite;
                         {
                             title: "Actions",
                             field: "actions",
-                            formatter: (cell, formatterParams) => {
-                                return `
-                    <button class="btn btn-primary btn-sm action-button" data-id="${cell.getRow().getData().id}">
-                        Action
-                    </button>
-                `;
-                            },
-                            hozAlign: "center",
-                            width: 120,
+                            formatter: this.formatActionCell,
+                            headerSort: false,
+                            hozAlign: "left",
                         },
                     ],
+                    index: "memberNumber",
+                    layout: "fitColumns",
                     persistence: true,
-                    placeholder: function () {
-                        return this.getHeaderFilters().length ? "No Matching Data" : "No Data"; //set placeholder based on if there are currently any header filters
+                    placeholder: () => {
+                        return "No Data";
                     },
-                    selectableRows: true,
+                    rowFormatter: (row) => this.formatRow(row),
+                    selectableRows: false,
                 });
-                //trigger download of data.csv file
-                document.getElementById("download-csv").addEventListener("click", () => {
-                    this.table.download("csv", "membership-report.csv");
-                });
-                //trigger download of data.json file
-                document.getElementById("download-json").addEventListener("click", () => {
-                    this.table.download("json", "membership-report.json");
-                });
-                //trigger download of data.xlsx file
-                document.getElementById("download-xlsx").addEventListener("click", () => {
-                    this.table.download("xlsx", "membership-report.xlsx", { sheetName: "Membership report" });
-                });
-                //trigger download of data.pdf file
-                document.getElementById("download-pdf").addEventListener("click", () => {
-                    this.table.download("pdf", "membership-report.pdf", {
-                        orientation: "portrait",
-                        title: "Membership database report",
-                    });
-                });
-                //trigger download of data.html file
-                document.getElementById("download-html").addEventListener("click", () => {
-                    this.table.download("html", "membership-report.html", { style: true });
-                });
-                document.getElementById("print-table").addEventListener("click", () => {
-                    this.table.print(false, true);
-                });
+                this.table.on("tableBuilt", () => this.gridReady());
+                this.table.on("dataChanged", (data) => this.dataChanged(data));
+                this.table.on("cellEdited", (cell) => this.cellEdited(cell));
+                this.wireUpGridDownloadButtons();
+                this.wireUpSaveAndCancelButtons();
+                window.addEventListener('load', () => this.adjustGridPadding());
+                window.addEventListener('resize', () => this.adjustGridPadding());
+            }
+            wireUpSaveAndCancelButtons() {
                 document.getElementById("cancel-button").addEventListener("click", () => {
                     this.table.setData();
                 });
@@ -110,61 +80,175 @@ var MembershipSite;
                     // TODO: Track state of data and only enable button when data has changed.
                     // Also add POST to save data.
                     this.table.getData();
+                    this.table.alert("Saving data.");
                 });
-                // Adjust padding on load and resize so that the floating toolbar doesn't cover the last row of the grid.
-                window.addEventListener('load', this.adjustGridPadding);
-                window.addEventListener('resize', this.adjustGridPadding);
             }
+            cellEdited(cell) {
+                const rowData = cell.getData();
+                rowData.isDirty = true;
+                rowData.approveAndSendEmail = true;
+                this.table.updateData([rowData]);
+            }
+            dataChanged(data) {
+                // If we wanted to set the save / cancel buttons to enabled / disabled based on whether there are changes we
+                // could do that here by checking for isDirty on the rows.
+            }
+            formatRow(row) {
+                const element = row.getElement();
+                const rowData = row.getData();
+                if (rowData.pendingDelete) {
+                    element.classList.add("table-danger");
+                }
+                else if (rowData.isDirty) {
+                    element.classList.add("table-warning");
+                }
+            }
+            wireUpGridDownloadButtons() {
+                // Trigger download of data.csv file.
+                document.getElementById("download-csv").addEventListener("click", () => {
+                    this.table.download("csv", "membership-report.csv");
+                });
+                // Trigger download of data.json file.
+                document.getElementById("download-json").addEventListener("click", () => {
+                    this.table.download("json", "membership-report.json");
+                });
+                // Trigger download of data.xlsx file.
+                document.getElementById("download-xlsx").addEventListener("click", () => {
+                    this.table.download("xlsx", "membership-report.xlsx", { sheetName: "Membership report" });
+                });
+                // Trigger download of data.pdf file.
+                document.getElementById("download-pdf").addEventListener("click", () => {
+                    this.table.download("pdf", "membership-report.pdf", {
+                        orientation: "portrait",
+                        title: "Membership database report",
+                    });
+                });
+                // Trigger download of data.html file.
+                document.getElementById("download-html").addEventListener("click", () => {
+                    this.table.download("html", "membership-report.html", { style: true });
+                });
+                document.getElementById("print-table").addEventListener("click", () => {
+                    this.table.print(false, true);
+                });
+            }
+            gridReady() {
+                this.grid.addEventListener("click", (e) => this.handleGridClick(e));
+            }
+            handleGridClick(event) {
+                const dropdownButton = event.target.closest(".action-button");
+                if (dropdownButton) {
+                    this.handleActionDropdownClick(dropdownButton);
+                    return;
+                }
+                const approveMenuItem = event.target.closest(".approve-menu-item");
+                if (approveMenuItem) {
+                    this.handleApproveMenuItemClick(approveMenuItem);
+                    return;
+                }
+                const deleteMenuItem = event.target.closest(".delete-menu-item");
+                if (deleteMenuItem) {
+                    this.handleDeleteMenuItemClick(deleteMenuItem);
+                }
+            }
+            handleApproveMenuItemClick(approveMenuItem) {
+                const memberNumber = approveMenuItem.dataset.memberNumber;
+                const row = this.table.getRow(memberNumber);
+                const rowData = row.getData();
+                rowData.isDirty = true;
+                rowData.approveAndSendEmail = true;
+                this.table.updateData([rowData]);
+                this.closeNearestDropdown(approveMenuItem);
+            }
+            handleDeleteMenuItemClick(deleteMenuItem) {
+                const memberNumber = deleteMenuItem.dataset.memberNumber;
+                const row = this.table.getRow(memberNumber);
+                const rowData = row.getData();
+                rowData.isDirty = true;
+                rowData.pendingDelete = true;
+                this.table.updateData([rowData]);
+                this.closeNearestDropdown(deleteMenuItem);
+            }
+            closeNearestDropdown(element) {
+                const dropdownMenu = element.closest(".dropdown-menu");
+                const dropdownButton = dropdownMenu === null || dropdownMenu === void 0 ? void 0 : dropdownMenu.previousElementSibling;
+                if (dropdownButton) {
+                    const dropdownInstance = bootstrap.Dropdown.getInstance(dropdownButton);
+                    dropdownInstance === null || dropdownInstance === void 0 ? void 0 : dropdownInstance.hide();
+                }
+            }
+            handleActionDropdownClick(button) {
+                const dropdownMenu = button.nextElementSibling;
+                const dropdownInstance = bootstrap.Dropdown.getOrCreateInstance(button, {
+                    popperConfig: (defaultBsPopperConfig) => {
+                        // Fix for dropdowns being cut off by the grid container.
+                        // See https://github.com/twbs/bootstrap/issues/35774
+                        return Object.assign(Object.assign({}, defaultBsPopperConfig), { strategy: 'fixed' });
+                    }
+                });
+                if (dropdownMenu.classList.contains("show")) {
+                    dropdownInstance.hide();
+                }
+                else {
+                    dropdownInstance.show();
+                }
+                // Close dropdown on outside click
+                const handleOutsideClick = (e) => {
+                    if (!dropdownMenu.contains(e.target) && e.target !== button) {
+                        dropdownInstance.hide();
+                        document.removeEventListener("click", handleOutsideClick);
+                    }
+                };
+                document.addEventListener("click", handleOutsideClick);
+            }
+            /**
+             * Formats the action cell for a row. The cell can be inspected to read the row data and render
+             * a split button with actions for "Delete" and "Approve and send email".
+             *
+             * For example:
+             *
+             *  const data = cell.getRow().getData();
+             *
+             *  if (data.isApproved) {
+             *      // Approve button will be output as disabled.
+             *  }
+             *
+             * @param cell
+             * @param formatterParams
+             * @returns {string}
+             */
+            formatActionCell(cell, formatterParams) {
+                const data = cell.getRow().getData();
+                return `
+                <div class="btn-group">
+                    <button 
+                        type="button" 
+                        class="btn btn-primary dropdown-toggle action-button" 
+                        aria-expanded="false">
+                        <i class="bi bi-file-earmark"></i> Actions
+                    </button>
+                    <div class="dropdown-menu p-2">
+                        <button
+                            class="dropdown-item approve-menu-item" 
+                            data-member-number="${data.memberNumber}" 
+                            ${data.isApproved ? 'disabled' : ''}
+                        >
+                            Approve and send email
+                        </button>
+                        <button class="dropdown-item delete-menu-item" data-member-number="${data.memberNumber}">
+                            Delete
+                        </button>
+                    </div>
+                </div>
+                `;
+            }
+            /**
+             * Adjusts the padding of the grid to accommodate the toolbar at the bottom of the page so that the grid is not obscured by the buttons.
+             */
             adjustGridPadding() {
                 const toolbar = document.getElementById("bottom-toolbar");
-                const grid = document.getElementById('member-grid');
-                if (toolbar && grid) {
+                if (toolbar && this.grid) {
                     const toolbarHeight = toolbar.offsetHeight;
-                    grid.style.paddingBottom = `${toolbarHeight + 20}px`; // Add some extra space for comfort
-                }
-            }
-            createCheckboxListeners() {
-                // Listen for checkbox changes on any row.
-                let rowTicks = document.querySelectorAll(".row-check");
-                rowTicks
-                    .forEach(checkbox => checkbox.addEventListener("change", () => this.rowTicked(rowTicks)));
-                // Listen for the 'tick all' button in header.
-                let checkAll = document.getElementById("CheckAll");
-                checkAll.addEventListener("change", () => {
-                    // Select all checkboxes.
-                    let checkboxes = document.querySelectorAll("input[type=checkbox].row-check");
-                    checkboxes
-                        .forEach(checkbox => checkbox.checked = checkAll.checked);
-                    // Refesh the buttons that are dependent on the rows being ticked.
-                    this.rowTicked(rowTicks);
-                });
-            }
-            rowTicked(rowTicks) {
-                let approvedCount = 0;
-                let unapprovedCount = 0;
-                for (const rowTick of rowTicks) {
-                    if (!rowTick.checked) {
-                        continue;
-                    }
-                    let parentTr = rowTick.closest("tr");
-                    if (parentTr.dataset.isApproved.toLowerCase() === "true") {
-                        approvedCount++;
-                    }
-                    else {
-                        unapprovedCount++;
-                    }
-                }
-                if (approvedCount) {
-                    this.approveAllTicked.classList.remove("disabled");
-                }
-                else {
-                    this.approveAllTicked.classList.add("disabled");
-                }
-                if (unapprovedCount) {
-                    this.revokeAllTicked.classList.remove("disabled");
-                }
-                else {
-                    this.revokeAllTicked.classList.add("disabled");
+                    this.grid.style.paddingBottom = `${toolbarHeight + 20}px`; // Add some extra space for comfort
                 }
             }
         }
