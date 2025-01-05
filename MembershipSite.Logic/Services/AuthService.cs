@@ -117,8 +117,7 @@ public class AuthService(AppSettings appSettings, IEmailProvider emailProvider, 
 
         var authenticationProperties = new AuthenticationProperties
         {
-            IsPersistent = true, // model.RememberMe,
-            ExpiresUtc = DateTimeOffset.UtcNow.AddDays(60) // Set cookie expiration date
+            IsPersistent = false,
         };
 
         var httpContext = httpContextAccessor.HttpContext!;
