@@ -1,7 +1,10 @@
 ﻿namespace MembershipSite.MemberAdmin {
     export class MemberList {
+        private readonly addMemberForm = document.getElementById("add-member-form") as HTMLFormElement;
         private readonly grid = document.getElementById("member-grid");
         private table: any;
+        private readonly fieldLimitEmail = this.parseField("field-limit-email");
+        private readonly fieldLimitName = this.parseField("field-limit-name");
 
         public static Init(): MemberList {
             return new MemberList();
@@ -13,6 +16,47 @@
 
         private WireUpUi(): void {
             this.createGrid();
+
+            this.addMemberForm.addEventListener("submit", (e) => this.onAddNewMemberFormSubmitted(e) );
+        }
+
+        private onAddNewMemberFormSubmitted(e: SubmitEvent): void {
+
+            // We'll save the form fields to the table which then saves via a button. No need to let the form submit to the server.
+            e.preventDefault();
+
+            const isValid = this.addMemberForm.checkValidity();
+
+            if (!isValid) {
+                return;
+            }
+
+            // Fetch the data from the modal.
+            const email = this.fieldValue("memberEmail", true);
+            const name = this.fieldValue("memberName", true);
+            const number = this.fieldValue("memberNumber", true);
+
+            // TODO: Add validation for these fields or will tabulator do this for us?
+            // Also, memberNumber to be numeric only. Can it handle 0 prefixes? Other is email.
+            // TODO: The actions menu 'approve and email' need to work with new rows. So should Delete which would just delete client side for new members.
+            // Add it to tabulator.
+            this.table.addData([{ memberNumber: number, name: name, email: email, isDirty: true }], true);
+
+            // Hide the modal.
+            const modalElement = document.getElementById("addMemberModal");
+            let modalInstance = bootstrap.Modal.getInstance(modalElement);
+            modalInstance.hide();
+        }
+
+        private fieldValue(elementId: string, clearValue: boolean): string {
+            const element = document.getElementById(elementId) as HTMLInputElement;
+            const value = element.value;
+
+            if (clearValue) {
+                element.value = "";
+            }
+
+            return value;
         }
 
         private parseField(id: string): number {
@@ -21,16 +65,13 @@
 
         private createGrid(): void {
 
-            const fieldLimitName = this.parseField("field-limit-name");
-            const fieldLimitEmail = this.parseField("field-limit-email");
-
             this.table = new Tabulator(this.grid, {
                 ajaxURL: "/backstage/member-grid-data",
                 columns:
                     [
                         { title: "Member Number", field: "memberNumber", hozAlign: "right", sorter: "number", headerFilter: true },
-                        { title: "Name", field: "name", editor: "input", validator: [`maxLength:${fieldLimitName}`, "required"], headerFilter: true },
-                        { title: "Email", field: "email", editor: "input", validator: [`maxLength:${fieldLimitEmail}`, "required"], headerFilter: true },
+                        { title: "Name", field: "name", editor: "input", validator: [`maxLength:${this.fieldLimitName}`, "required"], headerFilter: true },
+                        { title: "Email", field: "email", editor: "input", validator: [`maxLength:${this.fieldLimitEmail}`, "required"], headerFilter: true },
                         {
                             title: "Approved", field: "isApproved", hozAlign: "center", formatter: "toggle",
                             formatterParams: { clickable: true }
