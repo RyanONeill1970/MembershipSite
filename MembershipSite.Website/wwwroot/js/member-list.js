@@ -16,6 +16,15 @@ var MembershipSite;
             WireUpUi() {
                 this.createGrid();
                 this.addMemberForm.addEventListener("submit", (e) => this.onAddNewMemberFormSubmitted(e));
+                const addMemberModal = document.getElementById('addMemberModal');
+                // When showing the modal, focus on the first field.
+                addMemberModal.addEventListener("shown.bs.modal", () => {
+                    document.getElementById("memberName").focus();
+                });
+                addMemberModal.addEventListener("hidden.bs.modal", () => {
+                    // Clear any validation errors and the form inputs in case the user shows it again.
+                    this.addMemberForm.reset();
+                });
             }
             onAddNewMemberFormSubmitted(e) {
                 // We'll save the form fields to the table which then saves via a button. No need to let the form submit to the server.
@@ -28,9 +37,6 @@ var MembershipSite;
                 const email = this.fieldValue("memberEmail", true);
                 const name = this.fieldValue("memberName", true);
                 const number = this.fieldValue("memberNumber", true);
-                // TODO: Add validation for these fields or will tabulator do this for us?
-                // Also, memberNumber to be numeric only. Can it handle 0 prefixes? Other is email.
-                // TODO: The actions menu 'approve and email' need to work with new rows. So should Delete which would just delete client side for new members.
                 // Add it to tabulator.
                 this.table.addData([{ memberNumber: number, name: name, email: email, isDirty: true }], true);
                 // Hide the modal.
