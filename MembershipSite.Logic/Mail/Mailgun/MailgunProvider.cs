@@ -1,4 +1,5 @@
-﻿namespace MembershipSite.Logic.Mail;
+﻿namespace MembershipSite.Logic.Mail.Mailgun;
+using MembershipSite.Logic.Mail;
 
 public class MailgunProvider(EmailConfig emailConfig, ILogger<MailgunProvider> logger) : IEmailProvider
 {

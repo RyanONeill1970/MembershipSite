@@ -1,6 +1,7 @@
 ﻿global using MembershipSite.Contracts;
 global using MembershipSite.Datalayer;
 global using MembershipSite.Logic.ExtensionMethods;
+global using MembershipSite.Logic.Mail;
 global using MembershipSite.Logic.Services;
 global using MembershipSite.ViewModels;
 global using MembershipSite.ViewModels.Auth;

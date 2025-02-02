@@ -11,4 +11,6 @@ public class EmailConfig
     public string Username { get; set; } = "";
 
     public bool UseSsl { get; set; }
+
+    public string WebhookSigningKey { get; set; } = "";
 }

@@ -10,6 +10,7 @@ public static class ServiceCollectionExtensions
             .AddSingleton(appSettings.EmailConfig)
             .AddTransient<AuthService>()
             .AddTransient<IEmailProvider, MailgunProvider>()
+            .AddTransient<IEmailWebhookHandler, MailgunWebhookHandler>()
             .AddTransient<MemberAdminService>();
 
         return services;
