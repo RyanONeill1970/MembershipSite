@@ -16,8 +16,8 @@ public class MailgunWebhookHandler(EmailConfig emailConfig, ILogger<MailgunWebho
             return Task.CompletedTask;
         }
 
-        logger.LogInformation("Mailgun delivery report: {Payload}", request);
-        AppLogging.Write($"MailgunDeliveryReport, {request.ToJson()}");
+        logger.LogInformation("Mailgun delivery report: {Payload}", payload);
+        AppLogging.Write($"MailgunDeliveryReport, {payload}");
 
         return Task.CompletedTask;
     }
@@ -31,8 +31,8 @@ public class MailgunWebhookHandler(EmailConfig emailConfig, ILogger<MailgunWebho
             return Task.CompletedTask;
         }
 
-        logger.LogInformation("Mailgun spam report: {Payload}", request);
-        AppLogging.Write($"MailgunSpamReport, {request.ToJson()}");
+        logger.LogInformation("Mailgun spam report: {Payload}", payload);
+        AppLogging.Write($"MailgunSpamReport, {payload}");
 
         return Task.CompletedTask;
     }

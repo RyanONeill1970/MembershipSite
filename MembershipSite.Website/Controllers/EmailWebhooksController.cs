@@ -14,8 +14,16 @@ public class EmailWebhooksController(IEmailWebhookHandler emailWebhookHandler) :
 {
     [HttpPost]
     [Route("delivery-report")]
-    [Route("spam-report")]
     public async Task<IActionResult> DeliveryReport()
+    {
+        var payload = await new StreamReader(Request.Body).ReadToEndAsync();
+        await emailWebhookHandler.HandleDeliveryReportAsync(payload);
+        return Ok();
+    }
+
+    [HttpPost]
+    [Route("spam-report")]
+    public async Task<IActionResult> SpamReport()
     {
         var payload = await new StreamReader(Request.Body).ReadToEndAsync();
         await emailWebhookHandler.HandleSpamReportAsync(payload);
