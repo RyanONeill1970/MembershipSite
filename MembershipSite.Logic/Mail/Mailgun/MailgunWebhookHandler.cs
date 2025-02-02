@@ -45,23 +45,32 @@ public class MailgunWebhookHandler(EmailConfig emailConfig, ILogger<MailgunWebho
             return null;
         }
 
-        var request = JsonSerializer.Deserialize<T>(payload);
-
-        if (request is null)
+        try
         {
-            logger.LogWarning("Failed to deserialise Mailgun request for {Context}, Payload: {Payload}",
+            var request = JsonSerializer.Deserialize<T>(payload);
+
+            if (request is null)
+            {
+                logger.LogWarning("Failed to deserialise Mailgun request for {Context}, Payload: {Payload}",
+                    context, payload);
+                return null;
+            }
+
+            if (!VerifySignature(request))
+            {
+                logger.LogWarning("Invalid Mailgun signature for {Context}, Payload: {Payload}",
+                    context, payload);
+                return null;
+            }
+
+            return request;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to deserialise Mailgun request for {Context}, Payload: {Payload}",
                 context, payload);
             return null;
         }
-
-        if (!VerifySignature(request))
-        {
-            logger.LogWarning("Invalid Mailgun signature for {Context}, Payload: {Payload}",
-                context, payload);
-            return null;
-        }
-
-        return request;
     }
 
     private bool VerifySignature(MailgunWebhookBase request)

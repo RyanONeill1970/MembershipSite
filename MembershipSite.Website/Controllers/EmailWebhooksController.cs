@@ -7,6 +7,7 @@
 /// 
 /// A future improvement would be to make it generic and handle multiple services.
 /// </summary>
+[AllowAnonymous]
 [Route("email-webhooks")]
 [ApiController]
 public class EmailWebhooksController(IEmailWebhookHandler emailWebhookHandler) : ControllerBase
