@@ -159,6 +159,7 @@ public class MemberAdminService(AppSettings appSettings, IEmailProvider emailPro
             .Select(m => new MemberSummaryRow
             {
                 Email = m.Email,
+                IsAdmin = m.IsAdmin,
                 IsApproved = m.IsApproved,
                 DateRegistered = m.DateRegistered,
                 MemberNumber = m.MemberNumber,
@@ -169,12 +170,45 @@ public class MemberAdminService(AppSettings appSettings, IEmailProvider emailPro
 
     public async Task SaveMemberDataAsync(List<MemberSummaryRow> members)
     {
+        await ProcessAdminLoggingAsync(members);
         ProcessDeletes(members);
         await ProcessUpdates(members);
         await memberDal.CommitAsync();
 
         // Do this last as if the above fails, we don't want to send emails.
         await ProcessApprovalEmails(members);
+    }
+
+    private async Task ProcessAdminLoggingAsync(List<MemberSummaryRow> members)
+    {
+        var toAdmin = members
+            .Where(m => m.PendingAdminChange)
+            .Where(m => !m.IsAdmin)
+            .Select(m => $"{m.MemberNumber} - {m.Name} - {m.Email}")
+            .ToList();
+
+        if (toAdmin.Count == 0)
+        {
+            return;
+        }
+
+        var body = $"""
+            The following logins have been granted admin access to {appSettings.ApplicationName}.
+
+            If any of these logins should not have access to the member details then please log in and remove their admin access.
+            """;
+        var subject = $"{appSettings.ApplicationName} - admin access granted to users.";
+        var contacts = appSettings.EmailContacts;
+
+        if (contacts.RegistrationContacts is not null)
+        {
+            foreach (var registrationContact in contacts.RegistrationContacts)
+            {
+                await emailProvider.SendAsync(registrationContact.Name, registrationContact.Email,
+                    contacts.WebsiteFromName, contacts.WebsiteFromEmail,
+                    subject, body, [], false, contacts.DeveloperEmail);
+            }
+        }
     }
 
     private async Task ProcessApprovalEmails(List<MemberSummaryRow> members)
@@ -223,6 +257,10 @@ public class MemberAdminService(AppSettings appSettings, IEmailProvider emailPro
 
             member.Email = row.Email;
             member.IsApproved = row.IsApproved;
+            if (row.PendingAdminChange)
+            {
+                member.IsAdmin = !member.IsAdmin;
+            }
             member.Name = row.Name;
         }
     }

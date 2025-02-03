@@ -82,7 +82,30 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary" id="addMemberButton">Add</button>
+                    <button type="submit" class="btn btn-primary">Add</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="adminWarningModal" tabindex="-1" aria-labelledby="adminWarningModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="admin-warning-form">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="adminWarningModalLabel">Warning</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <p>You are about to add the following accounts as administrators, are you sure?</p>
+                        <ul id="adminWarningList" class="list-unstyled"></ul>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No (cancel)</button>
+                    <button type="submit" class="btn btn-primary">Yes (grant admin)</button>
                 </div>
             </form>
         </div>

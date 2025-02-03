@@ -11,6 +11,9 @@ public class MemberSummaryRow
     [JsonPropertyName("email")]
     public string Email { get; set; }
 
+    [JsonPropertyName("isAdmin")]
+    public bool IsAdmin { get; set; }
+
     [JsonPropertyName("isApproved")]
     public bool IsApproved { get; set; }
 
@@ -22,6 +25,12 @@ public class MemberSummaryRow
 
     [JsonPropertyName("name")]
     public string Name { get; set; }
+
+    /// <summary>
+    /// When sent from the client, toggles the admin role membership.
+    /// </summary>
+    [JsonPropertyName("pendingAdminChange")]
+    public bool PendingAdminChange { get; set; }
 
     [JsonPropertyName("pendingDelete")]
     public bool PendingDelete { get; set; }

@@ -8,6 +8,9 @@ var MembershipSite;
             }
             constructor() {
                 this.addMemberForm = document.getElementById("add-member-form");
+                this.adminWarningForm = document.getElementById("admin-warning-form");
+                this.addMemberModal = document.getElementById("addMemberModal");
+                this.adminWarningModal = document.getElementById("adminWarningModal");
                 this.grid = document.getElementById("member-grid");
                 this.fieldLimitEmail = this.parseField("field-limit-email");
                 this.fieldLimitName = this.parseField("field-limit-name");
@@ -15,16 +18,28 @@ var MembershipSite;
             }
             WireUpUi() {
                 this.createGrid();
+                this.wireUpAddMemberModal();
+                this.wireUpAdminWarningModal();
+            }
+            wireUpAddMemberModal() {
                 this.addMemberForm.addEventListener("submit", (e) => this.onAddNewMemberFormSubmitted(e));
-                const addMemberModal = document.getElementById('addMemberModal');
                 // When showing the modal, focus on the first field.
-                addMemberModal.addEventListener("shown.bs.modal", () => {
+                this.addMemberModal.addEventListener("shown.bs.modal", () => {
                     document.getElementById("memberName").focus();
                 });
-                addMemberModal.addEventListener("hidden.bs.modal", () => {
+                this.addMemberModal.addEventListener("hidden.bs.modal", () => {
                     // Clear any validation errors and the form inputs in case the user shows it again.
                     this.addMemberForm.reset();
                 });
+            }
+            wireUpAdminWarningModal() {
+                this.adminWarningForm.addEventListener("submit", (e) => this.onAdminWarningAcknowledged(e));
+            }
+            onAdminWarningAcknowledged(e) {
+                e.preventDefault();
+                let modalInstance = bootstrap.Modal.getInstance(this.adminWarningModal);
+                modalInstance.hide();
+                this.saveData();
             }
             onAddNewMemberFormSubmitted(e) {
                 // We'll save the form fields to the table which then saves via a button. No need to let the form submit to the server.
@@ -40,8 +55,7 @@ var MembershipSite;
                 // Add it to tabulator.
                 this.table.addData([{ memberNumber: number, name: name, email: email, isDirty: true }], true);
                 // Hide the modal.
-                const modalElement = document.getElementById("addMemberModal");
-                let modalInstance = bootstrap.Modal.getInstance(modalElement);
+                let modalInstance = bootstrap.Modal.getInstance(this.addMemberModal);
                 modalInstance.hide();
             }
             fieldValue(elementId, clearValue) {
@@ -78,7 +92,7 @@ var MembershipSite;
                         {
                             title: "Actions",
                             field: "actions",
-                            formatter: this.formatActionCell,
+                            formatter: (cell, formatterParams) => this.formatActionCell(cell, formatterParams),
                             headerSort: false,
                             hozAlign: "left",
                         },
@@ -104,12 +118,33 @@ var MembershipSite;
                 document.getElementById("cancel-button").addEventListener("click", () => {
                     this.table.setData();
                 });
-                document.getElementById("save-button").addEventListener("click", () => this.saveData());
+                document.getElementById("save-button").addEventListener("click", () => this.alertOnAdminChangeAndSave());
+            }
+            alertOnAdminChangeAndSave() {
+                const data = this.table.getData();
+                // If any of the rows have been changed from non-admin to admin, show a summary list of new
+                // admin users and ask form confirmation.
+                const pendingAdminRows = data
+                    .filter((row) => row.pendingAdminChange && !row.isAdmin);
+                if (pendingAdminRows.length > 0) {
+                    const adminWarningList = document.getElementById("adminWarningList");
+                    adminWarningList.innerHTML = "";
+                    pendingAdminRows.forEach((row) => {
+                        const listItem = document.createElement("li");
+                        listItem.textContent = `${row.memberNumber} - ${row.name} - ${row.email}`;
+                        adminWarningList.appendChild(listItem);
+                    });
+                    const modalInstance = bootstrap.Modal.getOrCreateInstance(this.adminWarningModal);
+                    modalInstance.show();
+                    return;
+                }
+                // No admin promotions, so just save the data.
+                this.saveData();
             }
             async saveData() {
-                const data = this.table.getData();
                 try {
                     this.table.alert("Saving data.");
+                    const data = this.table.getData();
                     const response = await fetch("/backstage/save-member-data", {
                         method: "POST",
                         headers: {
@@ -136,12 +171,10 @@ var MembershipSite;
             }
             cellEdited(cell) {
                 const rowData = cell.getData();
+                const row = this.table.getRow(rowData.memberNumber);
                 rowData.isDirty = true;
-                if (cell.fieldName === "isApproved" && rowData.isApproved === false) {
-                    // Approve turned off, so also turn off the 'send email' flag.
-                    rowData.approveAndSendEmail = false;
-                }
                 this.table.updateData([rowData]);
+                this.refreshActionCell(row);
             }
             dataChanged(data) {
                 // If we wanted to set the save / cancel buttons to enabled / disabled based on whether there are changes we
@@ -199,6 +232,11 @@ var MembershipSite;
                     this.handleApproveMenuItemClick(approveMenuItem);
                     return;
                 }
+                const toggleAdminMenuItem = event.target.closest(".toggle-admin-menu-item");
+                if (toggleAdminMenuItem) {
+                    this.handleToggleAdminMenuItemClick(toggleAdminMenuItem);
+                    return;
+                }
                 const deleteMenuItem = event.target.closest(".delete-menu-item");
                 if (deleteMenuItem) {
                     this.handleDeleteMenuItemClick(deleteMenuItem);
@@ -213,6 +251,22 @@ var MembershipSite;
                 rowData.approveAndSendEmail = true;
                 this.table.updateData([rowData]);
                 this.closeNearestDropdown(approveMenuItem);
+            }
+            handleToggleAdminMenuItemClick(toggleAdminMenuItem) {
+                const memberNumber = toggleAdminMenuItem.dataset.memberNumber;
+                const row = this.table.getRow(memberNumber);
+                const rowData = row.getData();
+                rowData.isDirty = true;
+                // Tell the server to toggle the current status of isAdmin.
+                rowData.pendingAdminChange = !rowData.pendingAdminChange;
+                this.table.updateData([rowData]);
+                this.refreshActionCell(row);
+                this.closeNearestDropdown(toggleAdminMenuItem);
+            }
+            refreshActionCell(row) {
+                // Manually force the formatter to refresh this cell to update the admin button text.
+                const actionsCell = row.getCell("actions");
+                actionsCell.setValue(actionsCell.getValue());
             }
             handleDeleteMenuItemClick(deleteMenuItem) {
                 const memberNumber = deleteMenuItem.dataset.memberNumber;
@@ -273,6 +327,7 @@ var MembershipSite;
              */
             formatActionCell(cell, formatterParams) {
                 const data = cell.getRow().getData();
+                let isAdminButtonText = this.adminMenuText(data);
                 return `
                 <div class="btn-group">
                     <button 
@@ -285,9 +340,11 @@ var MembershipSite;
                         <button
                             class="dropdown-item approve-menu-item" 
                             data-member-number="${data.memberNumber}" 
-                            ${data.isApproved ? 'disabled' : ''}
-                        >
+                            ${data.isApproved ? 'disabled' : ''}>
                             Approve and send email
+                        </button>
+                        <button class="dropdown-item toggle-admin-menu-item" data-member-number="${data.memberNumber}">
+                            ${isAdminButtonText}
                         </button>
                         <button class="dropdown-item delete-menu-item" data-member-number="${data.memberNumber}">
                             Delete
@@ -295,6 +352,20 @@ var MembershipSite;
                     </div>
                 </div>
                 `;
+            }
+            adminMenuText(data) {
+                if (data.isAdmin) {
+                    if (data.pendingAdminChange) {
+                        return "Pending admin removal";
+                    }
+                    else {
+                        return "Remove admin";
+                    }
+                }
+                if (data.pendingAdminChange) {
+                    return "Pending admin promotion";
+                }
+                return "Make admin";
             }
             /**
              * Adjusts the padding of the grid to accommodate the toolbar at the bottom of the page so that the grid is not obscured by the buttons.
