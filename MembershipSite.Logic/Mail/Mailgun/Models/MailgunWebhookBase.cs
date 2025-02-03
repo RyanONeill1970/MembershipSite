@@ -9,7 +9,7 @@ public record MailgunWebhookBase
     [JsonPropertyName("signature")]
     public required MailgunSignature Signature { get; set; }
 
-    [JsonPropertyName("eventdata")]
+    [JsonPropertyName("event-data")]
     public MailgunWebhookEventData EventData { get; set; }
 }
 
