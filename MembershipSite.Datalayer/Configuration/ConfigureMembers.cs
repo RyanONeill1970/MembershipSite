@@ -18,6 +18,9 @@ public static partial class TableConfiguration
                 .IsRequired(true)
                 .IsUnicode(true);
 
+            entity.HasIndex(m => m.Email)
+                .IsUnique();
+
             entity.Property(m => m.MemberNumber)
                 .HasMaxLength(MemberFieldLimits.MemberNumber)
                 .IsUnicode(false);
