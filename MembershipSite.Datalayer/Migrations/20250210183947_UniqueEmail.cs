@@ -6,12 +6,6 @@
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateIndex(
-                name: "IX_Member_Email",
-                table: "Member",
-                column: "Email",
-                unique: true);
-
             // Update rows with duplicate email addresses so that the duplicated rows have
             // -dupe appended to the email address.
             var sql = """
@@ -35,6 +29,12 @@
                 	DuplicateEmails.RowNum > 1;
                 """;
             migrationBuilder.Sql(sql);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Member_Email",
+                table: "Member",
+                column: "Email",
+                unique: true);
         }
 
         /// <inheritdoc />
