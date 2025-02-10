@@ -9,24 +9,27 @@
             // Update rows with duplicate email addresses so that the duplicated rows have
             // -dupe appended to the email address.
             var sql = """
-                WITH DuplicateEmails AS (
-                    SELECT 
+                WITH DuplicateEmails AS
+                (
+                    SELECT
+                        MemberNumber,
                         Email,
                         ROW_NUMBER() OVER (PARTITION BY Email ORDER BY MemberNumber) AS RowNum
                     FROM 
                         Member
                 )
                 UPDATE
-                	Member
+                    Member
                 SET
-                	Member.Email = Member.Email + '-dupe'
+                    Member.Email = Member.Email + '-dupe'
                 FROM
-                	Member
-                Inner JOIN
-                	DuplicateEmails
-                ON	Member.Email = DuplicateEmails.Email
+                    Member
+                INNER JOIN
+                    DuplicateEmails
+                ON
+                    Member.MemberNumber = DuplicateEmails.MemberNumber
                 WHERE
-                	DuplicateEmails.RowNum > 1;
+                    DuplicateEmails.RowNum > 1;
                 """;
             migrationBuilder.Sql(sql);
 
