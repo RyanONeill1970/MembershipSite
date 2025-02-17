@@ -55,4 +55,7 @@
     </Content>
   </ItemGroup>
 
+  <PropertyGroup>
+	<PreserveCompilationContext>true</PreserveCompilationContext>
+  </PropertyGroup>
 </Project>
