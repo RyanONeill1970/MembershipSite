@@ -56,6 +56,7 @@ public class AuthController(AppSettings appSettings, AuthService authService, IL
                 return this.RedirectToLocal(model.ReturnUrl);
             }
 
+            //xx
             if (loginResult == LoginResult.Administrator)
             {
                 if (string.IsNullOrWhiteSpace(model.ReturnUrl))
