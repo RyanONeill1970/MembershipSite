@@ -15,7 +15,7 @@ public class WebhookSpamDeserialisationTests
         {
             WebhookSigningKey = "a",
         };
-        mailgunWebhookHandler = new MailgunWebhookHandler(emailConfig, null);
+        mailgunWebhookHandler = new MailgunWebhookHandler(null, null, emailConfig, null, null, null);
     }
 
     [Fact]
@@ -67,7 +67,7 @@ public class WebhookSpamDeserialisationTests
             }
         """;
 
-        var request = mailgunWebhookHandler.Deserialise<MailgunRequest>(json, "")!;
+        var request = mailgunWebhookHandler.Deserialise<MailgunSpamReport>(json, "")!;
 
         Assert.Equal("id-goes-here", request.EventData.Id);
         Assert.True(request.EventData.Message.Headers.ContainsValue("Test complained webhook"));

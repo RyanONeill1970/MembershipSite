@@ -11,6 +11,12 @@ public class MemberSummaryRow
     [JsonPropertyName("email")]
     public string Email { get; set; }
 
+    [JsonPropertyName("emailLastFailed")]
+    public DateTimeOffset? EmailLastFailed { get; set; }
+
+    [JsonPropertyName("emailLastSucceeded")]
+    public DateTimeOffset? EmailLastSucceeded { get; set; }
+
     [JsonPropertyName("isAdmin")]
     public bool IsAdmin { get; set; }
 

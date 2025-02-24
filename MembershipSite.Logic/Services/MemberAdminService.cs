@@ -159,6 +159,8 @@ public class MemberAdminService(AppSettings appSettings, IEmailProvider emailPro
             .Select(m => new MemberSummaryRow
             {
                 Email = m.Email,
+                EmailLastFailed = m.EmailLastFailed,
+                EmailLastSucceeded = m.EmailLastSucceeded,
                 IsAdmin = m.IsAdmin,
                 IsApproved = m.IsApproved,
                 DateRegistered = m.DateRegistered,

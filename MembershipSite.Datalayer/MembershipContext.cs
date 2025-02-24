@@ -11,6 +11,8 @@ public class MembershipContext : DbContext, IDataProtectionKeyContext
     {
     }
 
+    public DbSet<AuditLog> AuditLogs { get; set; }
+
     public DbSet<Member> Members { get; set; }
 
     public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
@@ -18,6 +20,7 @@ public class MembershipContext : DbContext, IDataProtectionKeyContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder
+            .ConfigureAuditLog()
             .ConfigureMembers();
     }
 }

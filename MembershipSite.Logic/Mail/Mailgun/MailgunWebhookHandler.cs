@@ -5,36 +5,96 @@
 /// </summary>
 /// <param name="emailConfig"></param>
 /// <param name="logger">Only ever null when used in a unit test.</param>
-public class MailgunWebhookHandler(EmailConfig emailConfig, ILogger<MailgunWebhookHandler>? logger) : IEmailWebhookHandler
+public class MailgunWebhookHandler(AppSettings appSettings, AuditLogDal auditLogDal,
+    EmailConfig emailConfig, IEmailProvider emailProvider, ILogger<MailgunWebhookHandler>? logger,
+    MemberDal memberDal) : IEmailWebhookHandler
 {
-    public Task HandleDeliveryReportAsync(string payload)
+    public async Task HandleDeliveryReportAsync(string payload)
     {
-        var request = Deserialise<MailgunRequest>(payload, nameof(HandleDeliveryReportAsync));
+        var request = Deserialise<MailgunDeliveryReport>(payload, nameof(HandleDeliveryReportAsync));
 
         if (request is null)
         {
-            return Task.CompletedTask;
+            return;
         }
 
-        logger?.LogInformation("Mailgun delivery report: {Payload}", payload);
-        AppLogging.Write($"MailgunDeliveryReport, {payload}");
+        var member = await memberDal.ByEmailAsync(request.EventData.Recipient);
 
-        return Task.CompletedTask;
+        if (member is not null && member.EmailLastSucceeded is null && member.EmailLastFailed is not null)
+        {
+            // This is the first successful email after a failure, let membership know it went through.
+            var contacts = appSettings.EmailContacts;
+
+            if (contacts.RegistrationContacts is not null)
+            {
+                var body = $"Emails to {request.EventData.Recipient} are now being delivered again.";
+
+                foreach (var registrationContact in contacts.RegistrationContacts)
+                {
+                    await emailProvider.SendAsync(registrationContact.Name, registrationContact.Email, contacts.WebsiteFromName, contacts.WebsiteFromEmail,
+                        "Website membership registration", body, [], false, contacts.DeveloperEmail);
+                }
+            }
+
+            member.EmailLastFailed = null;
+            member.EmailLastSucceeded = DateTimeOffset.UtcNow;
+        }
+
+        var auditLog = auditLogDal.Add();
+        auditLog.Email = request.EventData.Recipient;
+        auditLog.EventName = "Delivery";
+        auditLog.Payload = payload;
+        auditLog.Success = true;
+
+        auditLogDal.SweepOldRecords();
+
+        await memberDal.CommitAsync();
     }
 
-    public Task HandleSpamReportAsync(string payload)
+    public async Task HandleSpamReportAsync(string payload)
     {
-        var request = Deserialise<MailgunRequest>(payload, nameof(HandleSpamReportAsync));
+        var request = Deserialise<MailgunSpamReport>(payload, nameof(HandleSpamReportAsync));
 
         if (request is null)
         {
-            return Task.CompletedTask;
+            return;
         }
 
-        logger?.LogInformation("Mailgun spam report: {Payload}", payload);
-        AppLogging.Write($"MailgunSpamReport, {payload}");
+        var member = await memberDal.ByEmailAsync(request.EventData.Recipient);
 
-        return Task.CompletedTask;
+        if (member is not null && member.EmailLastFailed is null)
+        {
+            // This is the first successful email after a failure, let membership know it went through.
+            var contacts = appSettings.EmailContacts;
+
+            if (contacts.RegistrationContacts is not null)
+            {
+                var body = $"""
+                    Email to {request.EventData.Recipient} has not been delivered.
+                    You will not receive any more non-delivery reports for this email address
+                    until a successful delivery has been made.
+                    """;
+
+                foreach (var registrationContact in contacts.RegistrationContacts)
+                {
+                    await emailProvider.SendAsync(registrationContact.Name, registrationContact.Email, contacts.WebsiteFromName, contacts.WebsiteFromEmail,
+                        "Website membership registration", body, [], false, contacts.DeveloperEmail);
+                }
+            }
+
+            member.EmailLastFailed = DateTimeOffset.UtcNow;
+            member.EmailLastSucceeded = null;
+        }
+
+        var auditLog = auditLogDal.Add();
+        auditLog.Email = request.EventData.Recipient;
+        auditLog.EventName = "NonDelivery";
+        auditLog.Payload = payload;
+        auditLog.Success = false;
+
+        auditLogDal.SweepOldRecords();
+
+        await memberDal.CommitAsync();
     }
 
     internal T? Deserialise<T>(string payload, string context) where T : MailgunWebhookBase
@@ -60,6 +120,13 @@ public class MailgunWebhookHandler(EmailConfig emailConfig, ILogger<MailgunWebho
             {
                 logger?.LogWarning("Invalid Mailgun signature for {Context}, Payload: {Payload}",
                     context, payload);
+                return null;
+            }
+
+            if (request.EventData.Recipient is null)
+            {
+                logger?.LogWarning("Null recipient in Mailgun delivery report: {Payload}, {Request}", payload, request);
+                AppLogging.Write($"Null recipient in Mailgun delivery report, {payload}, {request.ToJson()}");
                 return null;
             }
 

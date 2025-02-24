@@ -4,6 +4,7 @@ using MembershipSite.Datalayer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MembershipSite.Datalayer.Migrations
 {
     [DbContext(typeof(MembershipContext))]
-    partial class MembershipContextModelSnapshot : ModelSnapshot
+    [Migration("20250224183923_EmailAudit")]
+    partial class EmailAudit
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -34,12 +37,6 @@ namespace MembershipSite.Datalayer.Migrations
                         .IsUnicode(true)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("EventName")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .IsUnicode(true)
-                        .HasColumnType("nvarchar(20)");
-
                     b.Property<DateTimeOffset>("EventOccurred")
                         .HasColumnType("datetimeoffset");
 
@@ -52,7 +49,8 @@ namespace MembershipSite.Datalayer.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EventOccurred");
+                    b.HasIndex("Email")
+                        .IsUnique();
 
                     b.ToTable("AuditLog", (string)null);
                 });

@@ -6,6 +6,10 @@ public class Member
 
     public string Email { get; set; } = "";
 
+    public DateTimeOffset? EmailLastFailed { get; set; }
+
+    public DateTimeOffset? EmailLastSucceeded { get; set; }
+
     public bool IsAdmin { get; set; }
 
     public bool IsApproved { get; set; }
