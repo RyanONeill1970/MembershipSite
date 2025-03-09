@@ -194,10 +194,14 @@ public class MemberAdminService(AppSettings appSettings, IEmailProvider emailPro
             return;
         }
 
+        var adminLines = string.Join(Environment.NewLine, toAdmin);
+
         var body = $"""
             The following logins have been granted admin access to {appSettings.ApplicationName}.
 
             If any of these logins should not have access to the member details then please log in and remove their admin access.
+
+            {adminLines}
             """;
         var subject = $"{appSettings.ApplicationName} - admin access granted to users.";
         var contacts = appSettings.EmailContacts;
