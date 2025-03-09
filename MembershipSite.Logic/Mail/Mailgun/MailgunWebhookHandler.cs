@@ -15,24 +15,28 @@ public class MailgunWebhookHandler(AppSettings appSettings, AuditLogDal auditLog
 
         if (request is null)
         {
+            logger?.LogWarning("Failed to deserialise Mailgun delivery report, payload was {Json}.", payload);
             return;
         }
 
         var member = await memberDal.ByEmailAsync(request.EventData.Recipient);
 
-        if (member is not null && member.EmailLastSucceeded is null && member.EmailLastFailed is not null)
+        if (member is not null)
         {
-            // This is the first successful email after a failure, let membership know it went through.
-            var contacts = appSettings.EmailContacts;
-
-            if (contacts.RegistrationContacts is not null)
+            if (member.EmailLastSucceeded is null && member.EmailLastFailed is not null)
             {
-                var body = $"Emails to {request.EventData.Recipient} are now being delivered again.";
+                // This is the first successful email after a failure, let membership know it went through.
+                var contacts = appSettings.EmailContacts;
 
-                foreach (var registrationContact in contacts.RegistrationContacts)
+                if (contacts.RegistrationContacts is not null)
                 {
-                    await emailProvider.SendAsync(registrationContact.Name, registrationContact.Email, contacts.WebsiteFromName, contacts.WebsiteFromEmail,
-                        "Website membership registration", body, [], false, contacts.DeveloperEmail);
+                    var body = $"Emails to {request.EventData.Recipient} are now being delivered again.";
+
+                    foreach (var registrationContact in contacts.RegistrationContacts)
+                    {
+                        await emailProvider.SendAsync(registrationContact.Name, registrationContact.Email, contacts.WebsiteFromName, contacts.WebsiteFromEmail,
+                            "Website membership registration", body, [], false, contacts.DeveloperEmail);
+                    }
                 }
             }
 
@@ -62,23 +66,26 @@ public class MailgunWebhookHandler(AppSettings appSettings, AuditLogDal auditLog
 
         var member = await memberDal.ByEmailAsync(request.EventData.Recipient);
 
-        if (member is not null && member.EmailLastFailed is null)
+        if (member is not null)
         {
-            // This is the first successful email after a failure, let membership know it went through.
-            var contacts = appSettings.EmailContacts;
-
-            if (contacts.RegistrationContacts is not null)
+            if (member.EmailLastFailed is null)
             {
-                var body = $"""
+                // This is the first failure, let membership know it failed to go through.
+                var contacts = appSettings.EmailContacts;
+
+                if (contacts.RegistrationContacts is not null)
+                {
+                    var body = $"""
                     Email to {request.EventData.Recipient} has not been delivered.
                     You will not receive any more non-delivery reports for this email address
-                    until a successful delivery has been made.
+                    until a successful delivery has been made (of which you'll also receive a report).
                     """;
 
-                foreach (var registrationContact in contacts.RegistrationContacts)
-                {
-                    await emailProvider.SendAsync(registrationContact.Name, registrationContact.Email, contacts.WebsiteFromName, contacts.WebsiteFromEmail,
-                        "Website membership registration", body, [], false, contacts.DeveloperEmail);
+                    foreach (var registrationContact in contacts.RegistrationContacts)
+                    {
+                        await emailProvider.SendAsync(registrationContact.Name, registrationContact.Email, contacts.WebsiteFromName, contacts.WebsiteFromEmail,
+                            "Website membership registration", body, [], false, contacts.DeveloperEmail);
+                    }
                 }
             }
 

@@ -73,7 +73,14 @@ var MembershipSite;
                 this.table = new Tabulator(this.grid, {
                     ajaxURL: "/backstage/member-grid-data",
                     columns: [
-                        { title: "Member Number", field: "memberNumber", hozAlign: "right", sorter: "number", headerFilter: true },
+                        {
+                            title: "Member Number",
+                            field: "memberNumber",
+                            formatter: (cell, formatterParams) => this.formatMemberNumberCell(cell, formatterParams),
+                            hozAlign: "right",
+                            sorter: "number",
+                            headerFilter: true
+                        },
                         { title: "Name", field: "name", editor: "input", validator: [`maxLength:${this.fieldLimitName}`, "required"], headerFilter: true },
                         { title: "Email", field: "email", editor: "input", validator: [`maxLength:${this.fieldLimitEmail}`, "required"], headerFilter: true },
                         {
@@ -220,6 +227,7 @@ var MembershipSite;
             }
             gridReady() {
                 this.grid.addEventListener("click", (e) => this.handleGridClick(e));
+                this.enableTooltips();
             }
             handleGridClick(event) {
                 const dropdownButton = event.target.closest(".action-button");
@@ -310,6 +318,27 @@ var MembershipSite;
                 document.addEventListener("click", handleOutsideClick);
             }
             /**
+             * Formats the cell for the member number to include a warning if the member could not be emailed.
+             * Also shows an info icon if the member has been successfully emailed.
+             * @param cell
+             * @param formatterParams
+             */
+            formatMemberNumberCell(cell, formatterParams) {
+                const data = cell.getRow().getData();
+                let prefix = "";
+                if (data.emailLastFailed) {
+                    const formattedDate = this.formatDate(new Date(data.emailLastFailed));
+                    const title = `An email was sent on '${formattedDate}' to this member but failed to be delivered. See the audit log for more details.`;
+                    prefix = `<i class="bi bi-exclamation-triangle text-danger" title="${title}" data-bs-toggle="tooltip" data-bs-title="${title}"></i> `;
+                }
+                else if (data.emailLastSucceeded) {
+                    const formattedDate = this.formatDate(new Date(data.emailLastSucceeded));
+                    const title = `An email was successfully delivered on '${formattedDate}' to this members service provider.`;
+                    prefix = `<i class="bi bi-info-circle text-info" title="${title}" data-bs-toggle="tooltip" data-bs-title="${title}"></i> `;
+                }
+                return `${prefix}${data.memberNumber}`;
+            }
+            /**
              * Formats the action cell for a row. The cell can be inspected to read the row data and render
              * a split button with actions for "Delete" and "Approve and send email".
              *
@@ -376,6 +405,32 @@ var MembershipSite;
                     const toolbarHeight = toolbar.offsetHeight;
                     this.grid.style.paddingBottom = `${toolbarHeight + 20}px`; // Add some extra space for comfort
                 }
+            }
+            formatDate(date) {
+                const dayOfWeek = date.toLocaleString('en', { weekday: 'short' }); // e.g. "Mon"
+                const day = this.ordinalSuffix(date.getDate()); // e.g. "24th"
+                const month = date.toLocaleString('en', { month: 'short' }); // e.g. "Jul"
+                const year = date.getFullYear(); // e.g. 2024
+                // Use .padStart(2, '0') to ensure two digits for hours/minutes
+                const hours = String(date.getHours()).padStart(2, '0'); // e.g. "14"
+                const minutes = String(date.getMinutes()).padStart(2, '0'); // e.g. "56"
+                return `${dayOfWeek}, ${day} ${month} ${year} ${hours}:${minutes}`;
+            }
+            ordinalSuffix(day) {
+                // Special case for teens
+                if (day > 3 && day < 21)
+                    return day + 'th';
+                // Otherwise, look at the last digit
+                switch (day % 10) {
+                    case 1: return day + 'st';
+                    case 2: return day + 'nd';
+                    case 3: return day + 'rd';
+                    default: return day + 'th';
+                }
+            }
+            enableTooltips() {
+                const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                tooltipTriggerList.map((tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl));
             }
         }
         MemberAdmin.MemberList = MemberList;
