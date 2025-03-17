@@ -3,11 +3,12 @@
 
 name: Build and deploy ASP.Net Core app to Azure Web App - MembershipWebsite
 
-on:
-  push:
-    branches:
-      - master
-  workflow_dispatch:
+# Disable deploy action as it kills the site. Using Publish from VS for now.
+# on:
+#   push:
+#     branches:
+#       - master
+#   workflow_dispatch:
 
 jobs:
   build:
