@@ -21,9 +21,6 @@ public class MailgunWebhookEventData
     [JsonPropertyName("id")]
     public string Id { get; set; }
 
-    [JsonPropertyName("timestamp")]
-    public float Timestamp { get; set; }
-
     [JsonPropertyName("log-level")]
     public string LogLevel { get; set; }
 
@@ -39,11 +36,20 @@ public class MailgunWebhookEventData
     [JsonPropertyName("message")]
     public Message Message { get; set; }
 
+    [JsonPropertyName("method")]
+    public string Method { get; set; }
+
     [JsonPropertyName("recipient")]
-    public string Recipient { get; set; }
+    public string RecipientEmail { get; set; }
+
+    [JsonPropertyName("recipient-domain")]
+    public string RecipientDomain { get; set; }
 
     [JsonPropertyName("tags")]
     public List<string> Tags { get; set; }
+
+    [JsonPropertyName("timestamp")]
+    public float Timestamp { get; set; }
 
     [JsonPropertyName("user-variables")]
     public Dictionary<string, string> UserVariables { get; set; }

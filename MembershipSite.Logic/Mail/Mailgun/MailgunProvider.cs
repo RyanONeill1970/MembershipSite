@@ -56,6 +56,19 @@ public class MailgunProvider(EmailConfig emailConfig, ILogger<MailgunProvider> l
         }
     }
 
+    public async Task SendMultipleAsync(List<EmailAndNamePair> recipients, string fromName, string fromEmail, string subject, string body, List<MimePart> files, bool isBodyHtml, string bcc, string replyName = "", string replyEmail = "")
+    {
+        if (recipients is null)
+        {
+            return;
+        }
+
+        foreach (var recipient in recipients)
+        {
+            await SendAsync(recipient.Name, recipient.Email, fromName, fromEmail, subject, body, files, isBodyHtml, bcc, replyName, replyEmail);
+        }
+    }
+
     private bool ConfigIsValid(EmailConfig emailConfig)
     {
         if (emailConfig is null)
