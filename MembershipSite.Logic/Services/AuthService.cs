@@ -1,6 +1,6 @@
 ﻿namespace MembershipSite.Logic.Services;
 
-public class AuthService(AppSettings appSettings, IEmailProvider emailProvider, IHttpContextAccessor httpContextAccessor, MemberDal memberDal, TimeProvider timeProvider)
+public class AuthService(AppSettings appSettings, AuditLogDal auditLogDal, IEmailProvider emailProvider, IHttpContextAccessor httpContextAccessor, MemberDal memberDal, TimeProvider timeProvider)
 {
     public async Task<RegisterUserOutput> RegisterUserAsync(RegisterViewModel model)
     {
@@ -71,19 +71,19 @@ public class AuthService(AppSettings appSettings, IEmailProvider emailProvider, 
 
         if (member is null)
         {
-            AppLogging.Write($"Login attempt for email '{model.Email}' failed as the email was not found.");
+            await LogAuditAsync("EmailNotFound", model.Email, $"Login attempt for email '{model.Email}' failed as the email was not found.", false);
             return LoginResult.NotFound;
         }
 
         if (!member.IsApproved)
         {
-            AppLogging.Write($"Login attempt for email '{model.Email}' failed as the member is not approved.");
+            await LogAuditAsync("NotApproved", model.Email, $"Login attempt for email '{model.Email}' failed as the member is not approved.", false);
             return LoginResult.NotApproved;
         }
 
         if (!PasswordValidator.ComparePassword(model.Password, member.PasswordHash))
         {
-            AppLogging.Write($"Login attempt for email '{model.Email}' failed as the password was incorrect.");
+            await LogAuditAsync("InvalidPassword", model.Email, $"Login attempt for email '{model.Email}' failed as the password was incorrect.", false);
             return LoginResult.InvalidPassword;
         }
 
@@ -91,12 +91,26 @@ public class AuthService(AppSettings appSettings, IEmailProvider emailProvider, 
 
         if (member.IsAdmin)
         {
-            AppLogging.Write($"Login attempt for email '{model.Email}' was successful as admin user.");
+            await LogAuditAsync("AdminLogin", model.Email, $"Login attempt for email '{model.Email}' was successful as admin user.", true);
             return LoginResult.Administrator;
         }
 
-        AppLogging.Write($"Login attempt for email '{model.Email}' was successful as normal user.");
+        await LogAuditAsync("Login", model.Email, $"Login attempt for email '{model.Email}' was successful as normal user.", true);
         return LoginResult.Success;
+    }
+
+    private async Task LogAuditAsync(string eventName, string email, string payload, bool success)
+    {
+        var auditLog = auditLogDal.Add();
+
+        auditLog.Email = email;
+        auditLog.EventName = eventName;
+        auditLog.Payload = payload;
+        auditLog.Success = success;
+
+        auditLogDal.SweepOldRecords();
+
+        await memberDal.CommitAsync();
     }
 
     private async Task SignInAsync(Datalayer.Models.Member member)
