@@ -16,7 +16,7 @@ public class AuditLogDal(MembershipContext context) : BaseDal(context)
     }
 
     /// <summary>
-    /// Deletes logs past 1000 rows or > 30 days old.
+    /// Deletes logs past 10000 rows or > 30 days old.
     /// </summary>
     public void SweepOldRecords()
     {
@@ -27,10 +27,10 @@ public class AuditLogDal(MembershipContext context) : BaseDal(context)
             .Where(log => log.EventOccurred < thirtyDaysAgo)
             .ExecuteDelete();
 
-        // Keep only the latest 1000 records
+        // Keep only the latest 10,000 records
         var logsToDelete = context.AuditLogs
             .OrderByDescending(log => log.EventOccurred)
-            .Skip(1000)
+            .Skip(10000)
             .ToList();
 
         context.AuditLogs.RemoveRange(logsToDelete);
