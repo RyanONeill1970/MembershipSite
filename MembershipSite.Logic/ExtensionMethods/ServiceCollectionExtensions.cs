@@ -8,6 +8,7 @@ public static class ServiceCollectionExtensions
             .AddDatalayer()
             .AddSingleton(appSettings)
             .AddSingleton(appSettings.EmailConfig)
+            .AddTransient<AuditService>()
             .AddTransient<AuthService>()
             .AddTransient<IEmailProvider, MailgunProvider>()
             .AddTransient<IEmailWebhookHandler, MailgunWebhookHandler>()

@@ -15,6 +15,11 @@ public class AuditLogDal(MembershipContext context) : BaseDal(context)
         return row;
     }
 
+    public IQueryable<AuditLog> AllAsQueryable()
+    {
+        return context.AuditLogs.AsQueryable();
+    }
+
     /// <summary>
     /// Deletes logs past 10000 rows or > 30 days old.
     /// </summary>

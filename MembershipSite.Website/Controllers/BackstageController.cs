@@ -2,8 +2,25 @@
 
 [Authorize(Roles = RoleNames.MemberAdmin)]
 [Route("backstage")]
-public class BackstageController(MemberAdminService memberAdminService) : Controller
+public class BackstageController(AuditService auditService, MemberAdminService memberAdminService) : Controller
 {
+    [ActionName("audit")]
+    [Route("audit", Name = nameof(Audit))]
+    [HttpGet]
+    public IActionResult Audit()
+    {
+        return View();
+    }
+
+    [ActionName("audit-grid-data")]
+    [Route("audit-grid-data", Name = nameof(AuditGridDataAsync))]
+    [HttpGet]
+    public async Task<JsonResult> AuditGridDataAsync()
+    {
+        var audits = await auditService.AuditAdminSummaryAsync();
+        return Json(audits);
+    }
+
     [ActionName("member-list")]
     [Route("")]
     [Route("member-list", Name = nameof(MemberList))]

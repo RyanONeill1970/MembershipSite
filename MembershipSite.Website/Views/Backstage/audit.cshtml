@@ -1,0 +1,25 @@
+﻿@section headEnd
+{
+    <link href="/lib/tabulator-tables/css/tabulator_bootstrap5.css" rel="stylesheet">
+}
+
+<h1>Audit trail</h1>
+
+<div id="audit-grid" class="mb-5"></div>
+
+@section scripts
+{
+    <script type="text/javascript" src="https://oss.sheetjs.com/sheetjs/xlsx.full.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.20/jspdf.plugin.autotable.min.js"></script>
+
+    <script type="text/javascript" src="/lib/luxon/luxon.js"></script>
+    <script type="text/javascript" src="/lib/tabulator-tables/js/tabulator.js"></script>
+
+    <script src="/js/issue-logger.js"></script>
+    <script src="/js/audit.js"></script>
+
+    <script>
+        window.currentPage = MembershipSite.MemberAdmin.Audit.Init();
+    </script>
+}
