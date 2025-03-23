@@ -7,17 +7,20 @@ public class RegisterViewModel
     [MaxLength(MemberFieldLimits.Email, ErrorMessage = "Emails can be a maximum of {0} characters.")]
     public string Email { get; set; }
 
-    [Required(ErrorMessage = "Please provide your 4 digit member number.")]
     [MaxLength(MemberFieldLimits.MemberNumber, ErrorMessage = "Member numbers can be a maximum of {0} characters.")]
-    public string MemberNumber { get; set; }
+    public string? MemberNumber { get; set; } = "";
 
     [Required(ErrorMessage = "Please enter your name.")]
     [MaxLength(MemberFieldLimits.Name, ErrorMessage = "Names can be a maximum of {0} characters.")]
     public string Name { get; set; }
 
     [Required(ErrorMessage = "Please choose a password.")]
-    [MaxLength(100, ErrorMessage = "Passwords should be a maximum of {0} characters.")]
+    [MaxLength(MemberFieldLimits.PasswordHash, ErrorMessage = "Passwords should be a maximum of {0} characters.")]
     public string Password { get; set; }
 
+    [Required(ErrorMessage = "Please confirm your password.")]
+    [Compare(nameof(Password), ErrorMessage = "The password and confirmation password do not match.")]
+    public string PasswordCompare { get; set; }
+  
     public string? RegistrationError { get; set; }
 }

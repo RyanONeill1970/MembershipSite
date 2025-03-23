@@ -7,6 +7,7 @@
         private readonly grid = document.getElementById("member-grid");
         private table: any;
         private readonly fieldLimitEmail = this.parseField("field-limit-email");
+        private readonly fieldLimitMemberNumber = this.parseField("field-limit-membernumber");
         private readonly fieldLimitName = this.parseField("field-limit-name");
 
         public static Init(): MemberList {
@@ -96,12 +97,14 @@
                 columns:
                     [
                         {
+                            editor: "input",
                             title: "Member Number",
                             field: "memberNumber",
                             formatter: (cell: any, formatterParams: any) => this.formatMemberNumberCell(cell, formatterParams),
                             hozAlign: "right",
                             sorter: "number",
-                            headerFilter: true
+                            headerFilter: true,
+                            validator: [`maxLength:${this.fieldLimitMemberNumber}`], 
                         },
                         { title: "Name", field: "name", editor: "input", validator: [`maxLength:${this.fieldLimitName}`, "required"], headerFilter: true },
                         { title: "Email", field: "email", editor: "input", validator: [`maxLength:${this.fieldLimitEmail}`, "required"], headerFilter: true },

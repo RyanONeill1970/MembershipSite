@@ -51,6 +51,7 @@
     </div>
 </div>
 
+<input type="hidden" id="field-limit-membernumber" value="@MemberFieldLimits.MemberNumber" />
 <input type="hidden" id="field-limit-name" value="@MemberFieldLimits.Name" />
 <input type="hidden" id="field-limit-email" value="@MemberFieldLimits.Email" />
 
@@ -71,12 +72,12 @@
                     </div>
                     <div class="mb-3">
                         <label for="memberEmail" class="form-label">Email</label>
-                        <input required="" class="form-control" placeholder="Email address" autofocus="" type="email" data-val="true" data-val-required="Please enter the member email address." id="memberEmail" name="memberEmail" value="" maxlength="@MemberFieldLimits.Email">
+                        <input required="" class="form-control" placeholder="Email address" type="email" data-val="true" data-val-required="Please enter the member email address." id="memberEmail" name="memberEmail" value="" maxlength="@MemberFieldLimits.Email">
                         <span class="field-validation-valid" data-valmsg-for="memberEmail" data-valmsg-replace="true"></span>
                     </div>
                     <div class="mb-3">
                         <label for="memberNumber" class="form-label">Member number</label>
-                        <input required="" class="form-control" placeholder="Name" autofocus="" type="number" data-val="true" data-val-required="Please enter the member number." id="memberNumber" name="memberNumber" value="" maxlength="@MemberFieldLimits.MemberNumber">
+                        <input class="form-control" placeholder="Name" type="number" data-val="true" id="memberNumber" name="memberNumber" value="" maxlength="@MemberFieldLimits.MemberNumber">
                         <span class="field-validation-valid" data-valmsg-for="memberNumber" data-valmsg-replace="true"></span>
                     </div>
                 </div>

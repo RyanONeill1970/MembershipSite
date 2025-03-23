@@ -80,27 +80,27 @@ public class MemberAdminService(AppSettings appSettings, IEmailProvider emailPro
             }
 
             var existingMember = members
-                .Where(m => string.Equals(m.MemberNumber, record.MemberNumber, StringComparison.InvariantCultureIgnoreCase))
+                .Where(m => string.Equals(m.Email, record.Email, StringComparison.InvariantCultureIgnoreCase))
                 .FirstOrDefault();
 
             if (existingMember is null)
             {
-                existingMember = memberDal.Add(record.MemberNumber);
+                existingMember = memberDal.Add(record.Email);
                 existingMember.IsAdmin = false;
                 existingMember.DateRegistered = DateTimeOffset.Now;
 
-                var logLine = $"Member number {existingMember.MemberNumber} added.";
+                var logLine = $"Member with email {existingMember.Email} added.";
                 result.Added.Add(logLine);
                 result.Detail.Add(logLine);
             }
             else
             {
-                var logLine = $"Member number {existingMember.MemberNumber} updated.";
+                var logLine = $"Member with email {existingMember.Email} updated.";
                 result.Updated.Add(logLine);
                 result.Detail.Add(logLine);
             }
 
-            existingMember.Email = record.Email;
+            existingMember.MemberNumber = record.MemberNumber;
             existingMember.Name = record.Name;
             existingMember.IsApproved = true;
         }
@@ -253,15 +253,15 @@ public class MemberAdminService(AppSettings appSettings, IEmailProvider emailPro
 
         foreach (var row in changed)
         {
-            var member = await memberDal.ByMembershipNumberAsync(row.MemberNumber);
+            var member = await memberDal.ByEmailAsync(row.Email);
 
             if (member is null)
             {
-                member = memberDal.Add(row.MemberNumber);
+                member = memberDal.Add(row.Email);
                 member.DateRegistered = DateTimeOffset.Now;
             }
 
-            member.Email = row.Email;
+            member.MemberNumber = row.MemberNumber;
             member.IsApproved = row.IsApproved;
             if (row.PendingAdminChange)
             {

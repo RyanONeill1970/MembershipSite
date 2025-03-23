@@ -34,7 +34,7 @@
                                     <span class="input-group-text">
                                         <i class="bi-person-vcard"></i>
                                     </span>
-                                    <input required class="form-control" placeholder="Member number" asp-for="MemberNumber">
+                                    <input class="form-control" placeholder="Member number (optional)" asp-for="MemberNumber">
                                     <span asp-validation-for="MemberNumber"></span>
                                 </div>
                                 <div class="input-group mb-3">
@@ -43,6 +43,13 @@
                                     </span>
                                     <input required class="form-control" type="password" placeholder="Password" asp-for="Password">
                                     <span asp-validation-for="Password"></span>
+                                </div>
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text">
+                                        <i class="bi-lock"></i>
+                                    </span>
+                                    <input required class="form-control" type="password" placeholder="Confirm Password" asp-for="PasswordCompare">
+                                    <span asp-validation-for="PasswordCompare"></span>
                                 </div>
                                 <div class="row">
                                     <div class="col-6">
@@ -60,6 +67,7 @@
                             <div>
                                 <h2>Already registered?</h2>
                                 <p>If you already have a login please follow the link below.</p>
+                                <p>Otherwise please fill in the fields to the left. If you know your member number, great. Don't worry, it's optional if you can't find it.</p>
                                 <a class="btn btn-lg btn-outline-light mt-3" asp-route="login">Go to login</a>
                             </div>
                         </div>

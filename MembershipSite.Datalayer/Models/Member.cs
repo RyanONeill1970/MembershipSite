@@ -4,7 +4,7 @@ public class Member
 {
     public DateTimeOffset DateRegistered { get; set; }
 
-    public string Email { get; set; } = "";
+    public required string Email { get; set; } = "";
 
     public DateTimeOffset? EmailLastFailed { get; set; }
 
@@ -14,7 +14,7 @@ public class Member
 
     public bool IsApproved { get; set; }
 
-    public required string MemberNumber { get; set; }
+    public string MemberNumber { get; set; } = "";
 
     public string Name { get; set; } = "";
 

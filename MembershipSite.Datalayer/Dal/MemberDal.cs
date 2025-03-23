@@ -2,9 +2,9 @@
 
 public class MemberDal(MembershipContext context) : BaseDal(context)
 {
-    public Member Add(string memberNumber)
+    public Member Add(string email)
     {
-        var row = new Member { MemberNumber = memberNumber };
+        var row = new Member { Email = email };
 
         context.Members.Add(row);
 
@@ -21,14 +21,6 @@ public class MemberDal(MembershipContext context) : BaseDal(context)
         return await context
             .Members
             .Where(m => m.Email == email)
-            .FirstOrDefaultAsync();
-    }
-
-    public async Task<Member?> ByMembershipNumberAsync(string memberNumber)
-    {
-        return await context
-            .Members
-            .Where(m => m.MemberNumber == memberNumber)
             .FirstOrDefaultAsync();
     }
 

@@ -8,7 +8,7 @@ public static partial class TableConfiguration
         {
             entity.ToTable(nameof(Member));
 
-            entity.HasKey(m => m.MemberNumber);
+            entity.HasKey(m => m.Email);
 
             entity.Property(m => m.DateRegistered)
                 .IsRequired(true);

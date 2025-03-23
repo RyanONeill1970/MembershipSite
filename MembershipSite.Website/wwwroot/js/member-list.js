@@ -13,6 +13,7 @@ var MembershipSite;
                 this.adminWarningModal = document.getElementById("adminWarningModal");
                 this.grid = document.getElementById("member-grid");
                 this.fieldLimitEmail = this.parseField("field-limit-email");
+                this.fieldLimitMemberNumber = this.parseField("field-limit-membernumber");
                 this.fieldLimitName = this.parseField("field-limit-name");
                 this.WireUpUi();
             }
@@ -74,12 +75,14 @@ var MembershipSite;
                     ajaxURL: "/backstage/member-grid-data",
                     columns: [
                         {
+                            editor: "input",
                             title: "Member Number",
                             field: "memberNumber",
                             formatter: (cell, formatterParams) => this.formatMemberNumberCell(cell, formatterParams),
                             hozAlign: "right",
                             sorter: "number",
-                            headerFilter: true
+                            headerFilter: true,
+                            validator: [`maxLength:${this.fieldLimitMemberNumber}`],
                         },
                         { title: "Name", field: "name", editor: "input", validator: [`maxLength:${this.fieldLimitName}`, "required"], headerFilter: true },
                         { title: "Email", field: "email", editor: "input", validator: [`maxLength:${this.fieldLimitEmail}`, "required"], headerFilter: true },
