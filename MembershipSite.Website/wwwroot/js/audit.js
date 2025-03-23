@@ -43,6 +43,16 @@ var MembershipSite;
                         return "No Data";
                     },
                     selectableRows: false,
+                    // Enable pagination
+                    pagination: true,
+                    paginationMode: "remote", // Use server-side pagination
+                    paginationSize: 10, // Number of rows per page
+                    paginationSizeSelector: [5, 10, 25, 50, 100], // Page size options
+                    paginationInitialPage: 1, // Start on first page
+                    ajaxParams: {}, // Additional parameters to send with AJAX requests
+                    ajaxConfig: {
+                        method: "GET", // Request type
+                    },
                 });
                 this.table.on("tableBuilt", () => this.gridReady());
                 window.addEventListener('load', () => this.adjustGridPadding());

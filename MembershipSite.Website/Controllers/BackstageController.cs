@@ -15,10 +15,29 @@ public class BackstageController(AuditService auditService, MemberAdminService m
     [ActionName("audit-grid-data")]
     [Route("audit-grid-data", Name = nameof(AuditGridDataAsync))]
     [HttpGet]
-    public async Task<JsonResult> AuditGridDataAsync()
+    public async Task<JsonResult> AuditGridDataAsync([FromQuery] AuditGridQueryParameters query)
     {
-        var audits = await auditService.AuditAdminSummaryAsync();
-        return Json(audits);
+        if (ModelState.IsValid)
+        {
+            var response = await auditService.AuditAdminSummaryAsync(query);
+
+            return Json(response);
+        }
+
+        var errors = ModelState
+            .Where(e => e.Value?.Errors.Count > 0)
+            .ToDictionary(
+                kvp => kvp.Key,
+                kvp => kvp.Value?.Errors.Select(e => e.ErrorMessage).ToArray()
+            );
+
+        var modelStateSummary = string.Join(", ", errors.Select(e => $"{e.Key}: {string.Join(", ", e.Value ?? [])}"));
+        AppLogging.Write($"AuditGridDataAsync ModelState invalid - {modelStateSummary}");
+
+        return new JsonResult(new { errors })
+        {
+            StatusCode = StatusCodes.Status400BadRequest
+        };
     }
 
     [ActionName("member-list")]
