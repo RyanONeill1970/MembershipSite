@@ -29,7 +29,13 @@ var MembershipSite;
                         },
                         { title: "Success", field: "success", headerFilter: true },
                         { title: "Event", field: "eventName", headerFilter: true },
-                        { title: "Detail", field: "payload", headerFilter: true },
+                        {
+                            title: "Detail", field: "payload", headerFilter: true, formatter: (cell) => {
+                                const value = cell.getValue();
+                                const encodedValue = this.encodeDetailField(value);
+                                return `<span class="detail-popover" title="${encodedValue}">${value}</span>`;
+                            }
+                        },
                     ],
                     layout: "fitColumns",
                     persistence: true,
@@ -38,8 +44,12 @@ var MembershipSite;
                     },
                     selectableRows: false,
                 });
+                this.table.on("tableBuilt", () => this.gridReady());
                 window.addEventListener('load', () => this.adjustGridPadding());
                 window.addEventListener('resize', () => this.adjustGridPadding());
+            }
+            gridReady() {
+                this.enableTooltips();
             }
             /**
              * Adjusts the padding of the grid to accommodate the toolbar at the bottom of the page so that the grid is not obscured by the buttons.
@@ -71,6 +81,44 @@ var MembershipSite;
                     case 2: return day + 'nd';
                     case 3: return day + 'rd';
                     default: return day + 'th';
+                }
+            }
+            enableTooltips() {
+                const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                tooltipTriggerList.map((tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl));
+            }
+            /**
+             * If the passed data looks like a JSON string, formats it nicely for display in a popover.
+             *
+             * Otherwise just returns the input.
+             * @param value
+             */
+            encodeDetailField(value) {
+                if (!value)
+                    return '';
+                try {
+                    // Check if the string is valid JSON
+                    const obj = JSON.parse(value);
+                    // Format the JSON string with indentation for better readability in the tooltip
+                    const formattedJson = JSON.stringify(obj, null, 2);
+                    // Encode special characters to prevent HTML injection and maintain proper display in tooltip
+                    return formattedJson
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;')
+                        .replace(/"/g, '&quot;')
+                        .replace(/'/g, '&#039;')
+                        .replace(/\n/g, '')
+                        .replace(/\s/g, '&nbsp;');
+                }
+                catch (e) {
+                    // If not valid JSON, just encode the string for safe HTML display
+                    return value
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;')
+                        .replace(/"/g, '&quot;')
+                        .replace(/'/g, '&#039;');
                 }
             }
         }
