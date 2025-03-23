@@ -57,6 +57,13 @@
                 ajaxConfig: {
                     method: "GET",              // Request type
                 },
+                // Add row formatter to highlight rows with success=false
+                rowFormatter: (row: any) => {
+                    const data = row.getData();
+                    if (data.success === false) {
+                        row.getElement().classList.add("bg-danger", "text-black");
+                    }
+                }
             });
 
             this.table.on("tableBuilt", () => this.gridReady());
