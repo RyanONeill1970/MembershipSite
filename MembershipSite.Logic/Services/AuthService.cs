@@ -172,6 +172,8 @@ public class AuthService(AppSettings appSettings, AuditLogDal auditLogDal, IEmai
             subject, body, null, false, contacts.DeveloperEmail);
 
         await memberDal.CommitAsync();
+
+        await LogAuditAsync("ForgotPassword", model.Email, $"Forgot password link generated for '{model.Email}'.", true);
     }
 
     public async Task LogoutAsync()
