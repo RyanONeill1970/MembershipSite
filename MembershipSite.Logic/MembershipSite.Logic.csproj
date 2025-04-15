@@ -10,8 +10,8 @@
 		<PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
 		<PackageReference Include="CsvHelper" Version="33.0.1" />
 		<PackageReference Include="MailKit" Version="4.11.0" />
-		<PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="9.0.3" />
-		<PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.3" />
+		<PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="9.0.4" />
+		<PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.4" />
 	</ItemGroup>
 
 	<ItemGroup>
