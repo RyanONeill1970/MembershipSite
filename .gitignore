@@ -368,3 +368,4 @@ FodyWeavers.xsd
 /BedfordshireFamilyHistorySociety.Website/Secure/**/*.mp4
 /BedfordshireFamilyHistorySociety.Website/wwwroot/coreui
 /MembershipSite.Website/appsettings.Development.json
+/MembershipSite.Website/appsettings.Production.json
