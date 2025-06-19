@@ -8,6 +8,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Content Remove="appsettings.Production.json" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<None Remove="secure\_index.html" />
 	</ItemGroup>
 
@@ -52,6 +56,12 @@
 		<Content Update="Views\Backstage\_Layout.cshtml">
 			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
 			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Update="appsettings.json">
+			<CopyToPublishDirectory>Never</CopyToPublishDirectory>
 		</Content>
 	</ItemGroup>
 
