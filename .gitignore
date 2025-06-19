@@ -362,10 +362,8 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
-/BedfordshireFamilyHistorySociety.Website/appsettings.Development.json
+/MembershipSite.Website/appsettings.*.json
 
-/BedfordshireFamilyHistorySociety.Website/Secure/**/*.pdf
-/BedfordshireFamilyHistorySociety.Website/Secure/**/*.mp4
-/BedfordshireFamilyHistorySociety.Website/wwwroot/coreui
-/MembershipSite.Website/appsettings.Development.json
-/MembershipSite.Website/appsettings.Production.json
+/MembershipSite.Website/Secure/**/*.pdf
+/MembershipSite.Website/Secure/**/*.mp4
+/MembershipSite.Website/wwwroot/coreui
