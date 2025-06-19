@@ -107,7 +107,7 @@ var MembershipSite;
                             hozAlign: "left",
                         },
                     ],
-                    index: "memberNumber",
+                    index: "email",
                     layout: "fitColumns",
                     persistence: true,
                     placeholder: () => {
@@ -181,7 +181,7 @@ var MembershipSite;
             }
             cellEdited(cell) {
                 const rowData = cell.getData();
-                const row = this.table.getRow(rowData.memberNumber);
+                const row = this.table.getRow(rowData.email);
                 rowData.isDirty = true;
                 this.table.updateData([rowData]);
                 this.refreshActionCell(row);
@@ -254,8 +254,8 @@ var MembershipSite;
                 }
             }
             handleApproveMenuItemClick(approveMenuItem) {
-                const memberNumber = approveMenuItem.dataset.memberNumber;
-                const row = this.table.getRow(memberNumber);
+                const email = approveMenuItem.dataset.email;
+                const row = this.table.getRow(email);
                 const rowData = row.getData();
                 rowData.isDirty = true;
                 rowData.isApproved = true;
@@ -264,8 +264,8 @@ var MembershipSite;
                 this.closeNearestDropdown(approveMenuItem);
             }
             handleToggleAdminMenuItemClick(toggleAdminMenuItem) {
-                const memberNumber = toggleAdminMenuItem.dataset.memberNumber;
-                const row = this.table.getRow(memberNumber);
+                const email = toggleAdminMenuItem.dataset.email;
+                const row = this.table.getRow(email);
                 const rowData = row.getData();
                 rowData.isDirty = true;
                 // Tell the server to toggle the current status of isAdmin.
@@ -280,8 +280,8 @@ var MembershipSite;
                 actionsCell.setValue(actionsCell.getValue());
             }
             handleDeleteMenuItemClick(deleteMenuItem) {
-                const memberNumber = deleteMenuItem.dataset.memberNumber;
-                const row = this.table.getRow(memberNumber);
+                const email = deleteMenuItem.dataset.email;
+                const row = this.table.getRow(email);
                 const rowData = row.getData();
                 rowData.isDirty = true;
                 rowData.pendingDelete = true;
@@ -371,14 +371,14 @@ var MembershipSite;
                     <div class="dropdown-menu p-2">
                         <button
                             class="dropdown-item approve-menu-item" 
-                            data-member-number="${data.memberNumber}" 
+                            data-email="${data.email}" 
                             ${data.isApproved ? 'disabled' : ''}>
                             Approve and send email
                         </button>
-                        <button class="dropdown-item toggle-admin-menu-item" data-member-number="${data.memberNumber}">
+                        <button class="dropdown-item toggle-admin-menu-item" data-email="${data.email}">
                             ${isAdminButtonText}
                         </button>
-                        <button class="dropdown-item delete-menu-item" data-member-number="${data.memberNumber}">
+                        <button class="dropdown-item delete-menu-item" data-email="${data.email}">
                             Delete
                         </button>
                     </div>

@@ -129,7 +129,7 @@
                             hozAlign: "left",
                         },
                     ],
-                index: "memberNumber",
+                index: "email",
                 layout: "fitColumns",
                 persistence: true,
                 placeholder: () => {
@@ -220,7 +220,7 @@
 
         private cellEdited(cell: any): void {
             const rowData = cell.getData();
-            const row = this.table.getRow(rowData.memberNumber);
+            const row = this.table.getRow(rowData.email);
 
             rowData.isDirty = true;
 
@@ -313,8 +313,8 @@
         }
 
         private handleApproveMenuItemClick(approveMenuItem: HTMLElement): void {
-            const memberNumber = approveMenuItem.dataset.memberNumber;
-            const row = this.table.getRow(memberNumber);
+            const email = approveMenuItem.dataset.email;
+            const row = this.table.getRow(email);
             const rowData = row.getData();
 
             rowData.isDirty = true;
@@ -327,8 +327,8 @@
         }
 
         private handleToggleAdminMenuItemClick(toggleAdminMenuItem: HTMLElement): void {
-            const memberNumber = toggleAdminMenuItem.dataset.memberNumber;
-            const row = this.table.getRow(memberNumber);
+            const email = toggleAdminMenuItem.dataset.email;
+            const row = this.table.getRow(email);
             const rowData = row.getData();
 
             rowData.isDirty = true;
@@ -348,8 +348,8 @@
         }
 
         private handleDeleteMenuItemClick(deleteMenuItem: HTMLElement): void {
-            const memberNumber = deleteMenuItem.dataset.memberNumber;
-            const row = this.table.getRow(memberNumber);
+            const email = deleteMenuItem.dataset.email;
+            const row = this.table.getRow(email);
             const rowData = row.getData();
 
             rowData.isDirty = true;
@@ -454,14 +454,14 @@
                     <div class="dropdown-menu p-2">
                         <button
                             class="dropdown-item approve-menu-item" 
-                            data-member-number="${data.memberNumber}" 
+                            data-email="${data.email}" 
                             ${data.isApproved ? 'disabled' : ''}>
                             Approve and send email
                         </button>
-                        <button class="dropdown-item toggle-admin-menu-item" data-member-number="${data.memberNumber}">
+                        <button class="dropdown-item toggle-admin-menu-item" data-email="${data.email}">
                             ${isAdminButtonText}
                         </button>
-                        <button class="dropdown-item delete-menu-item" data-member-number="${data.memberNumber}">
+                        <button class="dropdown-item delete-menu-item" data-email="${data.email}">
                             Delete
                         </button>
                     </div>
