@@ -9,6 +9,7 @@ global using MembershipSite.ViewModels.Auth;
 global using MembershipSite.Website.MvcLogic;
 global using Microsoft.AspNetCore.Authorization;
 global using Microsoft.AspNetCore.Mvc;
+global using Microsoft.AspNetCore.Mvc.ModelBinding;
 global using Microsoft.AspNetCore.Mvc.Razor;
 global using Microsoft.AspNetCore.Razor.TagHelpers;
 global using Microsoft.EntityFrameworkCore;

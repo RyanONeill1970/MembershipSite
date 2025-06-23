@@ -27,9 +27,11 @@ public class MemberSummaryRow
     public bool IsDirty { get; set; }
 
     [JsonPropertyName("memberNumber")]
+    [MaxLength(MemberFieldLimits.MemberNumber)]
     public string MemberNumber { get; set; }
 
     [JsonPropertyName("name")]
+    [MaxLength(MemberFieldLimits.Name)]
     public string Name { get; set; }
 
     /// <summary>

@@ -69,7 +69,7 @@ public class BackstageController(AuditService auditService, MemberAdminService m
             return Ok();
         }
 
-        return BadRequest();
+        return BadRequest(new { errors = ModelState.LogErrors() });
     }
 
     [ActionName("upload-members")]
