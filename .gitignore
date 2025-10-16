@@ -367,3 +367,4 @@ FodyWeavers.xsd
 /MembershipSite.Website/Secure/**/*.pdf
 /MembershipSite.Website/Secure/**/*.mp4
 /MembershipSite.Website/wwwroot/coreui
+/MembershipSite.Website/.config
