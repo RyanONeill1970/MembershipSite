@@ -66,6 +66,9 @@ public class Program
             await context.Database.MigrateAsync();
         }
 
+        // Redirect HTTP to HTTPS
+        app.UseHttpsRedirection();
+
         // If requester does not specify a file, use index.html
         var options = new DefaultFilesOptions();
         options.DefaultFileNames.Clear();
