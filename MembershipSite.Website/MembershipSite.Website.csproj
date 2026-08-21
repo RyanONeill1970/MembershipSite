@@ -33,7 +33,7 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="3.0.71" />
+		<PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="3.0.114" />
 		<PackageReference Include="Sentry.AspNetCore" Version="6.9.0" />
 	</ItemGroup>
 
