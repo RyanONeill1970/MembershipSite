@@ -9,7 +9,7 @@ If you have a need for a simple membership system, this project may be a good st
 If you think it's missing some functionality, either raise an issue or contact me (ryan at ryanoneill.com) and I may be able to help.
 
 ## Hosting
-* Requires .Net 8, can run in Linux plans. I've tested this on Microsoft Azure / Linux
+* Requires .Net 10, can run in Linux plans. I've tested this on Microsoft Azure / Linux
 * Requires Microsoft SQL Server
 * If you don't want to host your own instance and are a society / club, I may be able to host it for a reasonable fee (email ryan at ryanoneill.com). This would help me offset the costs of further development.
 
@@ -37,5 +37,5 @@ If you think it's missing some functionality, either raise an issue or contact m
 * A better name
 
 ## Tech
-* Written in C# using ASP.NET 8.
+* Written in C# using ASP.NET 10.
 * Uses Microsoft SQL Server and Entity Framework (may be overkill, other options can be added in future)
