@@ -8,7 +8,7 @@ description: Update/upgrade/bump NuGet packages in the MembershipSite solution �
 This solution has **no central package management** (no `Directory.Packages.props`, no
 `Directory.Build.props`, no `nuget.config`, no `packages.config`). The solution
 [`MembershipSite.Website.sln`](../../../MembershipSite.Website.sln) is all SDK-style projects on
-**net9.0**, so versions live in each project's `<PackageReference ... Version="...">` inside the
+**net10.0**, so versions live in each project's `<PackageReference ... Version="...">` inside the
 individual `.csproj` files. There are six projects:
 
 | Project | Has package references? |
@@ -16,7 +16,7 @@ individual `.csproj` files. There are six projects:
 | `MembershipSite.Contracts` | no |
 | `MembershipSite.ViewModels` | no (FrameworkReference only) |
 | `MembershipSite.Datalayer` | EF Core, DataProtection, Sentry |
-| `MembershipSite.Logic` | BCrypt.Net-Next, CsvHelper, MailKit, DataProtection, Microsoft.Extensions.Configuration |
+| `MembershipSite.Logic` | BCrypt.Net-Next, CsvHelper, MailKit, DataProtection |
 | `MembershipSite.Website` | ASP.NET Core, EF Core Design, TypeScript.MSBuild, LibraryManager.Build, Sentry.AspNetCore |
 | `MembershipSite.UnitTests` | xunit v2, Test.Sdk, coverlet, EF Core SqlServer |
 
@@ -101,10 +101,14 @@ breaking major.
 
 Known hazards in this repo:
 
-- **`Microsoft.*` 10.x on a net9.0 solution.** `--outdated` will offer `10.0.x` for EF Core, ASP.NET
-  Core and `Microsoft.Extensions.*`. Those generally require net10.0. **Do not take them** while the
-  projects target net9.0 — retargeting the whole solution is a separate job the user has to ask for.
-  Stay on the newest `9.0.x`.
+- **`Microsoft.*` past the current framework.** The solution moved to net10.0 in `bb2d5c3`, so the
+  `10.0.x` train is correct today. Never take an `11.x` (or any package whose lowest target framework
+  is newer than the projects') — retargeting the solution is a separate job the user has to ask for.
+- **`Microsoft.TypeScript.MSBuild` 6.x/7.x — known broken here.** 7.0.1 was trialled and **fails the
+  build**: 10 × `error TS2531: Object is possibly 'null'` in `wwwroot/js/member-list.ts`, and
+  `noEmitOnError: true` in `tsconfig.json` then blocks JS emit entirely. Taking TS 7 requires fixing
+  those null checks first — a real code change to the members admin grid, not a dependency bump. Stay
+  on the newest `5.x` unless the user explicitly asks to do that work.
 - **`Microsoft.Web.LibraryManager.Build`.** History shows a LibMan bump being taken and then reverted
   (`736eac7` "Update libman to latest" → `3d39e9c` "Revert buggy LibMan"). Bump it alone, and after
   building, confirm the client-side libraries in `MembershipSite.Website/libman.json` still restore
@@ -124,6 +128,13 @@ dotnet add <project.csproj> package <PackageId> --version <newVersion>
 Note the two `.csproj` indentation styles in this repo (Datalayer/Contracts/UnitTests use spaces,
 Logic/ViewModels/Website use tabs). Match whatever the file already does.
 
+**Preserve the UTF-8 BOM.** Every `.csproj` here starts with a BOM. PowerShell's `Set-Content`
+**strips it**, which shows up as a spurious first-line change in the diff. Write with .NET instead:
+
+```powershell
+[System.IO.File]::WriteAllText($f, $text, (New-Object System.Text.UTF8Encoding $true))
+```
+
 ### 3c. Build the solution
 ```bash
 dotnet build MembershipSite.Website.sln
@@ -133,7 +144,7 @@ solution builds clean before committing the group. The Website build also runs T
 and LibMan restore, so a build failure there may be tooling rather than C#.
 
 ### 3d. Run the unit tests
-The test project is **`MembershipSite.UnitTests`** (xUnit v2, net9.0). `dotnet test` works normally
+The test project is **`MembershipSite.UnitTests`** (xUnit v2, net10.0). `dotnet test` works normally
 here:
 
 ```bash
@@ -144,6 +155,27 @@ dotnet test MembershipSite.Website.sln
 class (`MailgunTests/WebhookDeserialisationTests.cs`). It will not catch a broken auth, email, or EF
 mapping change. A clean build plus your own reading of what the package changed is doing most of the
 work here; say so honestly in the report rather than implying the tests proved anything.
+
+Cheap checks that are worth far more than the suite, when the group warrants them:
+
+- **EF Core bumps** — confirm the upgrade is schema-neutral for the live database:
+
+  ```bash
+  dotnet ef migrations has-pending-model-changes --project MembershipSite.Datalayer --startup-project MembershipSite.Website
+  ```
+
+  "No changes have been made to the model since the last migration" means EF maps to exactly the same
+  schema and the 13 existing migrations still describe the database. Anything else needs the owner.
+- **BCrypt bumps** — load the old and new assemblies side by side and check hashes round-trip both
+  ways (they have different assembly names, so both load in one process). Password verification
+  breaking is silent and catastrophic; the tests will not catch it.
+- **TypeScript bumps** — the emitted `.js`/`.js.map` under `wwwroot/js` are **tracked in git**. Touch
+  the `.ts` files to force a recompile, then `git diff --numstat -- MembershipSite.Website/wwwroot/js`.
+  Empty numstat means the emit is byte-identical (line-ending-only noise is safe to `git checkout`).
+- **Never use `-t:Rebuild` on the Website project.** Its Clean step deletes the tracked generated
+  `.js` files, then the static-web-assets task fails with "No file exists for the asset". Recover with
+  `git checkout -- MembershipSite.Website/wwwroot/js`. Use a plain incremental build, and
+  `-v:normal` if you need to see that a target such as `LibraryManagerRestore` actually ran.
 
 ### 3e. Fix, or revert and skip
 If the build or tests fail, **attempt a fix first** — a bump that broke a call site is often a small,
@@ -156,6 +188,12 @@ git checkout -- <the .csproj files you changed>
 
 Be precise with the paths — a bare `git checkout -- .` would also blow away the unrelated modified
 files that are usually sitting in this working tree.
+
+**`git checkout -- <file>` reverts the WHOLE file, not just your hunk.** If that file also carries a
+pre-existing uncommitted change (`MembershipSite.Website.csproj` usually does), you will silently
+destroy the user's in-flight work. Before reverting a file you share with them, check
+`git diff -- <file>`; if there is a foreign hunk, revert by re-editing your own change back instead,
+and re-check the diff afterwards to confirm only their hunk remains.
 
 Record the group as skipped with the reason (e.g. "EF Core 10 needs net10.0 — needs owner decision")
 for the final report. One stubborn group must never block the rest.
@@ -177,6 +215,18 @@ Once it builds and tests pass, commit just this group with a specific message:
   — inline quoting mangles apostrophes on this Windows/PowerShell setup.
 - Stage only the files this group changed (`git add <those .csproj files>`), then commit. **Do not
   push.**
+- **`MembershipSite.Website.csproj` usually needs partial staging**, because it tends to carry an
+  unrelated uncommitted hunk. Stage just your hunks by filtering a zero-context diff:
+
+  ```powershell
+  $lines = git diff -U0 -- MembershipSite.Website/MembershipSite.Website.csproj
+  $hunks = @(); for ($i=0; $i -lt $lines.Count; $i++) { if ($lines[$i] -like '@@*') { $hunks += $i } }
+  $keep = $lines[0..($hunks[1]-1)]          # header + first hunk only; adjust which hunks you keep
+  [System.IO.File]::WriteAllText($patch, (($keep -join "`n") + "`n"))
+  git apply --cached --unidiff-zero $patch
+  ```
+
+  Then confirm with `git diff --cached` (yours) and `git diff` (theirs, still untouched).
 
 Then move to the next group.
 
@@ -195,8 +245,8 @@ flagged for the user still need a decision.
 
 - **Patch/minor:** apply freely. **Major:** research + flag before including.
 - **Stable only** — don't move a package onto a prerelease/RC version unless the user asks.
-- **Never bump a package past net9.0 support** — in practice, no `Microsoft.*` 10.x until the user
-  asks for a framework retarget.
+- **Never bump a package past the projects' target framework** (net10.0 today) — no `11.x` until the
+  user asks for a framework retarget.
 - Keep each commit self-consistent: it must build and pass unit tests on its own, so the history stays
   bisectable.
 - Never blanket-stage; this working tree is routinely full of unrelated untracked members-only content.
