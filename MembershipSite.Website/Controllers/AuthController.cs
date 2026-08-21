@@ -16,6 +16,7 @@ public class AuthController(AppSettings appSettings, AuthService authService, IL
     [ActionName("forgot-password")]
     [Route("forgot-password", Name = "forgot-password")]
     [HttpPost]
+    [ValidateAntiForgeryToken()]
     public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
     {
         if (ModelState.IsValid)
@@ -187,6 +188,7 @@ public class AuthController(AppSettings appSettings, AuthService authService, IL
     [ActionName("set-password")]
     [Route("set-password/{passwordResetToken:guid}", Name = "set-password")]
     [HttpPost]
+    [ValidateAntiForgeryToken()]
     public async Task<IActionResult> SetPassword(SetPasswordViewModel model)
     {
         if (ModelState.IsValid)
